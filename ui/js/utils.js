@@ -59,5 +59,5 @@ function setToken(token){
 }
 
 function getToken(req){
-    sessionStorage.getItem("token");
+    return sessionStorage.getItem("token");
 }

@@ -7,8 +7,9 @@
     <p>Upload file:</p>
     <input id="file-upload-input" type="file">
     <button type="button" id="file-upload-button">Upload</button>
-    <script src="js/grab.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/grab.js"></script>
+    <script src="js/posts.js"></script>
     <script>
         $(document).ready(function(){
             $('#file-upload-button').click(handleFileUploadClick);
@@ -37,7 +38,7 @@
             fileReader.addEventListener("load", function(){
                 //File has been loaded ~ send to server
                 let file = fileReader.result;
-                sendFilePost(file);
+                sendFilePost(file, handleFilePostResult);
             });
             //Load file if it exists
             if(fileEntry){
@@ -48,5 +49,11 @@
                 console.log("Could not load image");
             }
         };
+        /**
+         * Handle the return of a file post request
+         */
+        let handleFilePostResult = function(){
+
+        }
     </script>
 </body>
