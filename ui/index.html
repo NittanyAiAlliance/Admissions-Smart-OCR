@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>Transcript Image Upload</title>
+</head>
+<body>
+    <p>Upload file:</p>
+    <input id="file-upload-input" type="file">
+    <button type="button" id="file-upload-button">Upload</button>
+    <script src="js/grab.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#file-upload-button').click(handleFileUploadClick);
+            getApiToken(handleApiToken);
+        });
+        /**
+         * Handle API response to request for a token
+         */
+        let handleApiToken = function(apiResponse){
+            if(apiResponse.success){
+                console.log("Connected to API with token: " + apiResponse.token);
+            } else {
+                console.log("Could not connect to API");
+            }
+        };
+        /**
+         * Handle file upload button click
+         */
+        let handleFileUploadClick = function(){
+        };
+    </script>
+</body>
