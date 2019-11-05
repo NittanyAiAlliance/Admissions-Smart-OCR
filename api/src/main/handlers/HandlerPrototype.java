@@ -45,7 +45,7 @@ public abstract class HandlerPrototype {
         try{
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("localhost:6969")
+                    .withIssuer("localhost:2020")
                     .build(); //Reusable verifier instance
             DecodedJWT jwt = verifier.verify(token);
             System.out.println("Token " + token + " was verified");
