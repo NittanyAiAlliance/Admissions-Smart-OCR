@@ -1,0 +1,14 @@
+
+ui/.idea/workspace.xml
+ui/.idea/ui.iml
+ui/.idea/php.xml
+ui/.idea/modules.xml
+api/api.iml
+api/.idea/workspace.xml
+api/.idea/modules.xml
+api/.idea/misc.xml
+ui/.idea/misc.xml
+api/src/main/data/database.properties
+api/out/*
+api/src/main/META-INF/MANIFEST.MF
+api/src/META-INF/MANIFEST.MF
