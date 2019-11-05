@@ -16,18 +16,37 @@
         });
         /**
          * Handle API response to request for a token
+         * @param apiResponse return from get token request
          */
         let handleApiToken = function(apiResponse){
             if(apiResponse.success){
-                console.log("Connected to API with token: " + apiResponse.token);
+                //Received token - set to session
+                setToken(apiResponse.token);
             } else {
-                console.log("Could not connect to API");
+                //Server refused to give us a token
+                alert("Error: Server rejected connection");
             }
         };
         /**
          * Handle file upload button click
          */
         let handleFileUploadClick = function(){
+            //Get file from DOM element
+            let fileEntry = $('#file-upload-input').prop("files")[0];
+            let fileReader = new FileReader();
+            fileReader.addEventListener("load", function(){
+                //File has been loaded ~ send to server
+                let file = fileReader.result;
+                sendFilePost(file);
+            });
+            //Load file if it exists
+            if(fileEntry){
+                //File exists - read
+                fileReader.readAsDataURL(fileEntry);
+            } else {
+                //File does not exist
+                console.log("Could not load image");
+            }
         };
     </script>
 </body>
