@@ -12,3 +12,5 @@ api/src/main/data/database.properties
 api/out/*
 api/src/main/META-INF/MANIFEST.MF
 api/src/META-INF/MANIFEST.MF
+api/.idea/inspectionProfiles/profiles_settings.xml
+api/.idea/uiDesigner.xml
