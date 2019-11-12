@@ -6,14 +6,21 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import main.types.ILoggable;
+import main.types.Log;
 import org.json.JSONObject;
 
 import java.io.*;
 
-public abstract class HandlerPrototype {
+public abstract class HandlerPrototype implements ILoggable {
     protected String[] requiredKeys;
     protected String response;
     protected String handlerName;
+    protected Log log;
+
+    HandlerPrototype(){
+        log = new Log();
+    }
 
     JSONObject getParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
@@ -35,9 +42,9 @@ public abstract class HandlerPrototype {
 
     void displayRequestValidity(boolean isValidRequest){
         if(isValidRequest){
-            System.out.println("Valid Request");
+            this.log.addContent("Valid Request");
         } else {
-            System.out.println("Invalid Request");
+            this.log.addContent("Invalid Request");
         }
     }
 
@@ -58,13 +65,13 @@ public abstract class HandlerPrototype {
     protected boolean isRequestValid(JSONObject requestParams) {
         if (requestParams == null) {
             //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
+            this.log.addContent("Request Params Null");
             return false;
         }
         for (String requiredKey : requiredKeys) {
             if (!requestParams.has(requiredKey)) {
                 //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
+                this.log.addContent("Request Params Missing Key " + requiredKey);
                 return false;
             }
         }
@@ -95,7 +102,7 @@ public abstract class HandlerPrototype {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to " + handlerName + ": " + this.response);
+        this.log.addContent("Response to " + handlerName + ": " + this.response);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
