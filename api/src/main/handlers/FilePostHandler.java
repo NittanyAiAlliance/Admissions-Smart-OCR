@@ -3,6 +3,7 @@ package main.handlers;
 import com.sun.net.httpserver.HttpHandler;
 import org.json.JSONObject;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,7 +54,8 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
      * @return name of the file the image data was written into
      */
     private String writeImageToFile(String imgStr){
-        byte imgData[]  = imgStr.getBytes();
+        //Get the image base 64 encoding and convert to image byte array
+        byte imgData[] = DatatypeConverter.parseBase64Binary(imgStr.split(",")[1]);
         String dataFile = uploadTempFilePath + "/" + getTempFileRandomName();
         Path tempFile = Paths.get(dataFile);
         try {
