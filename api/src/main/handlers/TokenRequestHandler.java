@@ -3,6 +3,7 @@ package main.handlers;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.sun.net.httpserver.HttpHandler;
+import main.types.Log;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -27,6 +28,7 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
             Algorithm algorithm = Algorithm.HMAC256("secret");
             //Generate JWT token
             token = JWT.create().withIssuer("localhost:2020").sign(algorithm);
+            System.out.println(token);
         } catch (UnsupportedEncodingException uEE) {
             uEE.printStackTrace();
         }
@@ -40,5 +42,11 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
     @Override
     protected boolean isRequestValid(JSONObject requestParams) {
         return true;
+    }
+
+    @Override
+    public Log toLog(){
+        //Temporary boilerplate for logs
+        return new Log();
     }
 }

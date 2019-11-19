@@ -38,7 +38,7 @@ public class Server {
         //Initialize keystore
         char[] password = "password".toCharArray();
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        InputStream inputStream = Server.class.getClassLoader().getResourceAsStream("main/testkey.jks");
+        InputStream inputStream = Server.class.getClassLoader().getResourceAsStream("main/data/testkey.jks");
         keyStore.load(inputStream, password);
         //Create key manager factory and init
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");

@@ -1,9 +1,9 @@
 package main.handlers;
 
 import com.sun.net.httpserver.HttpHandler;
+import main.types.Log;
 import org.json.JSONObject;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +11,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Random;
 
 public class FilePostHandler extends HandlerPrototype implements HttpHandler {
@@ -27,7 +28,7 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
         String dataFileName = writeImageToFile(imgBlobString);
         String scriptPath = System.getProperty("user.home");
         //Create invoke command for python script with image encoding as command line arg
-        ProcessBuilder pb = new ProcessBuilder("python", scriptPath + "/csv.py", dataFileName);
+        ProcessBuilder pb = new ProcessBuilder("python", scriptPath + "/img-ocr.py", dataFileName);
         try {
             //Invoke python script
             Process p = pb.start();
@@ -36,6 +37,7 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             String csvLine = null;
             //Read script return
             while((csvLine = pyIn.readLine()) != null) {
+                System.out.println(csvLine);
                 csvString.append(csvLine);
             }
             JSONObject csvStrObj = new JSONObject();
@@ -55,12 +57,12 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
      */
     private String writeImageToFile(String imgStr){
         //Get the image base 64 encoding and convert to image byte array
-        byte imgData[] = DatatypeConverter.parseBase64Binary(imgStr.split(",")[1]);
+        byte[] imgData = Base64.getDecoder().decode(imgStr.split(",")[1]);
         String dataFile = uploadTempFilePath + "/" + getTempFileRandomName();
         Path tempFile = Paths.get(dataFile);
         try {
-
             Files.createFile(tempFile);
+            System.out.println("Creating file: " + dataFile);
         } catch (FileAlreadyExistsException faeEx){
             //In the extremely unlikely event of a random file name collision, make another name
             //This will happen 1 out of every 4.76 * 10^28 iterations
@@ -91,5 +93,10 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             salt.append(saltChars.charAt(index));
         }
         return salt.toString() + ".bin";
+    }
+
+    @Override
+    public Log toLog(){
+        return new Log();
     }
 }

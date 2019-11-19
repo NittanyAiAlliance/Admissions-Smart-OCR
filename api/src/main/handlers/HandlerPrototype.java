@@ -102,7 +102,8 @@ public abstract class HandlerPrototype implements ILoggable {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        this.log.addContent("Response to " + handlerName + ": " + this.response);
+        System.out.println(this.response);
+        //this.log.addContent("Response to " + handlerName + ": " + this.response);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
