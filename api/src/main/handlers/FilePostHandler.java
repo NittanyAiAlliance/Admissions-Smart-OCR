@@ -36,6 +36,7 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             StringBuilder csvString = new StringBuilder();
             String csvLine = null;
             //Read script return
+            p.waitFor();
             while((csvLine = pyIn.readLine()) != null) {
                 System.out.println(csvLine);
                 csvString.append(csvLine);
