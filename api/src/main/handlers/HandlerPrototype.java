@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import main.managers.LogManager;
 import main.types.ILoggable;
 import main.types.Log;
 import org.json.JSONObject;
@@ -21,9 +22,11 @@ public abstract class HandlerPrototype implements ILoggable {
     protected String response;
     protected String handlerName;
     protected Log log;
+    private LogManager logManager;
 
     HandlerPrototype(){
         log = new Log();
+        logManager = new LogManager();
     }
 
     JSONObject getParameterObject(HttpExchange httpExchange) throws IOException {
@@ -60,10 +63,10 @@ public abstract class HandlerPrototype implements ILoggable {
             byte[] hash = digest.digest(verificationProps.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
             String serverToken = Base64.getEncoder().encodeToString(hash);
             if(token.equals(serverToken)){
-                System.out.println("Token " + token + " was verified");
+                this.log.addContent("Token " + token + " was verified");
                 return true;
             } else {
-                System.out.println("Token " + token + " was not verified");
+                this.log.addContent("Token " + token + " was not verified");
                 return false;
             }
         } catch (Exception ex){
@@ -93,6 +96,7 @@ public abstract class HandlerPrototype implements ILoggable {
      * @throws IOException thrown if there is an issue with writing response data to client
      */
     public void handle(HttpExchange httpExchange) throws IOException {
+        this.log = new Log();
         //Get parameters from client
         JSONObject requestParams = getParameterObject(httpExchange);
         //Determine validity of request parameters and validate token
@@ -101,7 +105,6 @@ public abstract class HandlerPrototype implements ILoggable {
         displayRequestValidity(isValidRequest);
         if (isValidRequest) {
             //Request was valid, fulfill the request with params
-            System.out.println("Fulfilling request");
             fulfillRequest(requestParams);
         } else {
             //Request was invalid, set response to reflect this
@@ -112,8 +115,8 @@ public abstract class HandlerPrototype implements ILoggable {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println(this.response);
-        //this.log.addContent("Response to " + handlerName + ": " + this.response);
+        this.log.addContent("RETURN=" + this.response);
+        logManager.writeLog(this.log);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
@@ -153,5 +156,10 @@ public abstract class HandlerPrototype implements ILoggable {
     protected void returnActionSuccess(JSONObject returnArgs){
         returnArgs.put("success", true);
         this.response = returnArgs.toString();
+    }
+
+    @Override
+    public Log toLog(){
+        return this.log;
     }
 }
