@@ -1,6 +1,8 @@
 package main.handlers;
 
 import com.sun.net.httpserver.HttpHandler;
+import main.managers.LogManager;
+import main.types.ErrorLog;
 import main.types.Log;
 import org.json.JSONObject;
 
@@ -14,6 +16,7 @@ import java.util.Properties;
 
 public class TokenRequestHandler extends HandlerPrototype implements HttpHandler {
     public TokenRequestHandler() {
+        super();
         super.handlerName = "Token Request Handler";
     }
     @Override
@@ -27,7 +30,6 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
      * @return token string
      */
     private String createToken(){
-        System.out.println("Creating token");
         String token = "";
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -35,8 +37,12 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
             verificationDigestProperties.load(getClass().getResourceAsStream("auth.properties"));
             byte[] hash = digest.digest(verificationDigestProperties.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
             token = Base64.getEncoder().encodeToString(hash);
+            this.log.addContent("Hash verification token succeeded");
         } catch (NoSuchAlgorithmException | IOException nsaEx){
             returnActionFailure();
+            ErrorLog errorLog = new ErrorLog(nsaEx, "Hash verification token failed");
+            LogManager.writeErrorLog(errorLog);
+            this.log.addContent(errorLog.toString());
         }
         return token;
     }
@@ -48,11 +54,5 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
     @Override
     protected boolean isRequestValid(JSONObject requestParams) {
         return true;
-    }
-
-    @Override
-    public Log toLog(){
-        //Temporary boilerplate for logs
-        return new Log();
     }
 }
