@@ -16,3 +16,8 @@ api/.idea/inspectionProfiles/profiles_settings.xml
 api/.idea/uiDesigner.xml
 api/src/main/testkey.jks
 api/.idea/artifacts/api_jar.xml
+api/.idea/api.iml
+api/.idea/vcs.xml
+ui/.idea/vcs.xml
+ui/.idea/jsLibraryMappings.xml
+api/src/main/data/testkey.jks
