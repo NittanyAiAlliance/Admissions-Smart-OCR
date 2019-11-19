@@ -14,17 +14,9 @@ import java.sql.Timestamp;
 
 public class LogManager {
     private DatabaseInteraction database;
-    private Path errorLogFile;
+    private static final Path errorLogFile = Paths.get(System.getProperty("user.home") + "/logs/api_error_log.log");
     public LogManager(){
         database = new DatabaseInteraction();
-        errorLogFile = Paths.get(System.getProperty("user.home") + "/logs/api_error_log.log");
-        try {
-            if(!Files.exists(errorLogFile)){
-                Files.createFile(errorLogFile);
-            }
-        } catch (IOException ioEx) {
-            System.out.println("Could not access the error logging file");
-        }
     }
 
     /**
@@ -33,7 +25,7 @@ public class LogManager {
      */
     public void writeLog(Log thisLog){
         //Prepare log write statement
-        String writeLogSql = "INSERT INTO TRANSACTION_LOGS(TYPE, CONTENT, TIMESTAMP) VALUES (?, ?, ?))";
+        String writeLogSql = "INSERT INTO TRANSACTION_LOGS(TYPE, CONTENT, TIMESTAMP) VALUES (?, ?, ?)";
         PreparedStatement writeLogStmt = database.prepareStatement(writeLogSql);
         try {
             writeLogStmt.setInt(1, thisLog.getType().ordinal());
@@ -51,7 +43,13 @@ public class LogManager {
      * An exception has occurred in the API - uh oh. Write an error log to the error log file
      * @param log error log object
      */
-    public void writeErrorLog(ErrorLog log){
-
+    public static void writeErrorLog(ErrorLog log){
+        try {
+            if(!Files.exists(errorLogFile)){
+                Files.createFile(errorLogFile);
+            }
+        } catch (IOException ioEx) {
+            System.out.println("Could not access the error logging file");
+        }
     }
 }
