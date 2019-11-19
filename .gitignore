@@ -21,3 +21,4 @@ api/.idea/vcs.xml
 ui/.idea/vcs.xml
 ui/.idea/jsLibraryMappings.xml
 api/src/main/data/testkey.jks
+api/src/main/handlers/auth.properties
