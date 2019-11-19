@@ -1,12 +1,16 @@
 package main.handlers;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.sun.net.httpserver.HttpHandler;
 import main.types.Log;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Properties;
 
 public class TokenRequestHandler extends HandlerPrototype implements HttpHandler {
     public TokenRequestHandler() {
@@ -23,14 +27,16 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
      * @return token string
      */
     private String createToken(){
+        System.out.println("Creating token");
         String token = "";
-        try {
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            //Generate JWT token
-            token = JWT.create().withIssuer("localhost:2020").sign(algorithm);
-            System.out.println(token);
-        } catch (UnsupportedEncodingException uEE) {
-            uEE.printStackTrace();
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            Properties verificationDigestProperties = new Properties();
+            verificationDigestProperties.load(getClass().getResourceAsStream("auth.properties"));
+            byte[] hash = digest.digest(verificationDigestProperties.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
+            token = Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException | IOException nsaEx){
+            returnActionFailure();
         }
         return token;
     }

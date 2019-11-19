@@ -11,6 +11,10 @@ import main.types.Log;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.Properties;
 
 public abstract class HandlerPrototype implements ILoggable {
     protected String[] requiredKeys;
@@ -50,14 +54,19 @@ public abstract class HandlerPrototype implements ILoggable {
 
     private boolean isTokenValid(String token){
         try{
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("localhost:2020")
-                    .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            System.out.println("Token " + token + " was verified");
-            return true;
-        } catch (UnsupportedEncodingException useEx){
+            Properties verificationProps = new Properties();
+            verificationProps.load(getClass().getResourceAsStream("auth.properties"));
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(verificationProps.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
+            String serverToken = Base64.getEncoder().encodeToString(hash);
+            if(token.equals(serverToken)){
+                System.out.println("Token " + token + " was verified");
+                return true;
+            } else {
+                System.out.println("Token " + token + " was not verified");
+                return false;
+            }
+        } catch (Exception ex){
             return false;
         }
     }
@@ -92,6 +101,7 @@ public abstract class HandlerPrototype implements ILoggable {
         displayRequestValidity(isValidRequest);
         if (isValidRequest) {
             //Request was valid, fulfill the request with params
+            System.out.println("Fulfilling request");
             fulfillRequest(requestParams);
         } else {
             //Request was invalid, set response to reflect this
