@@ -42,14 +42,14 @@ public class ErrorLog extends Log {
     @Override
     public String toString(){
         //Construct error log content string
-        StringBuilder logString = new StringBuilder("ERROR: ");
+        StringBuilder logString = new StringBuilder("ERROR=");
         //Get the type string
         logString.append(LogType.values()[super.getType().ordinal()].toString());
-        logString.append(" | CONTENT: ");
+        logString.append("|CONTENT=");
         logString.append(super.getContent());
-        logString.append(" | MESSAGE: ");
+        logString.append("|MESSAGE=");
         logString.append(this.getErrorMessage());
-        logString.append(" | STACKTRACE: ");
+        logString.append("|STACKTRACE=");
         //Get the invoking stacktrace string
         String invokingExceptionStacktraceString = getInvokingExceptionStacktraceString();
         logString.append(invokingExceptionStacktraceString);
