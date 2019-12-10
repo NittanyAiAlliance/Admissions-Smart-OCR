@@ -1,5 +1,5 @@
 //API URL ADDRESS
-const apiUrl = "https://3.15.215.137:2020";
+const apiUrl = "https://localhost:2020";
 //API ENDPOINT MAP
 let apiNodeMap = {
     getToken : "/token/get",

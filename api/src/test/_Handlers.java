@@ -1,6 +1,5 @@
 package test;
 
-import main.handlers.FilePostHandler;
 import main.handlers.TokenRequestHandler;
 import static org.junit.Assert.*;
 
@@ -18,11 +17,5 @@ public class _Handlers {
         JSONObject requestResponse = new JSONObject(tokenRequestHandler.getResponse());
         assertTrue(requestResponse.getBoolean("success"));
         assertEquals(test_AWTString, requestResponse.getString("token"));
-    }
-    @Test
-    public void filePost(){
-        System.out.println("Testing file post request");
-        FilePostHandler filePostHandler = new FilePostHandler();
-
     }
 }

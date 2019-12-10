@@ -6,14 +6,28 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import main.managers.LogManager;
+import main.types.ILoggable;
+import main.types.Log;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.Properties;
 
-public abstract class HandlerPrototype {
+public abstract class HandlerPrototype implements ILoggable {
     protected String[] requiredKeys;
     protected String response;
     protected String handlerName;
+    protected Log log;
+    private LogManager logManager;
+
+    HandlerPrototype(){
+        log = new Log();
+        logManager = new LogManager();
+    }
 
     JSONObject getParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
@@ -35,22 +49,27 @@ public abstract class HandlerPrototype {
 
     void displayRequestValidity(boolean isValidRequest){
         if(isValidRequest){
-            System.out.println("Valid Request");
+            this.log.addContent("Valid Request");
         } else {
-            System.out.println("Invalid Request");
+            this.log.addContent("Invalid Request");
         }
     }
 
     private boolean isTokenValid(String token){
         try{
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("localhost:2020")
-                    .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            System.out.println("Token " + token + " was verified");
-            return true;
-        } catch (UnsupportedEncodingException useEx){
+            Properties verificationProps = new Properties();
+            verificationProps.load(getClass().getResourceAsStream("auth.properties"));
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(verificationProps.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
+            String serverToken = Base64.getEncoder().encodeToString(hash);
+            if(token.equals(serverToken)){
+                this.log.addContent("Token " + token + " was verified");
+                return true;
+            } else {
+                this.log.addContent("Token " + token + " was not verified");
+                return false;
+            }
+        } catch (Exception ex){
             return false;
         }
     }
@@ -58,13 +77,13 @@ public abstract class HandlerPrototype {
     protected boolean isRequestValid(JSONObject requestParams) {
         if (requestParams == null) {
             //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
+            this.log.addContent("Request Params Null");
             return false;
         }
         for (String requiredKey : requiredKeys) {
             if (!requestParams.has(requiredKey)) {
                 //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
+                this.log.addContent("Request Params Missing Key " + requiredKey);
                 return false;
             }
         }
@@ -77,6 +96,7 @@ public abstract class HandlerPrototype {
      * @throws IOException thrown if there is an issue with writing response data to client
      */
     public void handle(HttpExchange httpExchange) throws IOException {
+        this.log = new Log();
         //Get parameters from client
         JSONObject requestParams = getParameterObject(httpExchange);
         //Determine validity of request parameters and validate token
@@ -95,7 +115,8 @@ public abstract class HandlerPrototype {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to " + handlerName + ": " + this.response);
+        this.log.addContent("RETURN=" + this.response);
+        logManager.writeLog(this.log);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
@@ -135,5 +156,10 @@ public abstract class HandlerPrototype {
     protected void returnActionSuccess(JSONObject returnArgs){
         returnArgs.put("success", true);
         this.response = returnArgs.toString();
+    }
+
+    @Override
+    public Log toLog(){
+        return this.log;
     }
 }
