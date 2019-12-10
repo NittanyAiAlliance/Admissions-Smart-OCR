@@ -53,6 +53,7 @@ public class ErrorLog extends Log {
         //Get the invoking stacktrace string
         String invokingExceptionStacktraceString = getInvokingExceptionStacktraceString();
         logString.append(invokingExceptionStacktraceString);
+        logString.append("\n");
         return logString.toString();
     }
 

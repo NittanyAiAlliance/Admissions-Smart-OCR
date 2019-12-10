@@ -4,10 +4,12 @@ import main.data.DatabaseInteraction;
 import main.types.ErrorLog;
 import main.types.Log;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -48,6 +50,7 @@ public class LogManager {
             if(!Files.exists(errorLogFile)){
                 Files.createFile(errorLogFile);
             }
+            Files.write(errorLogFile, log.toString().getBytes(), StandardOpenOption.APPEND);
         } catch (IOException ioEx) {
             System.out.println("Could not access the error logging file");
         }
