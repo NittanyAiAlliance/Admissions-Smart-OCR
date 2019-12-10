@@ -1,12 +1,34 @@
 <!DOCTYPE html>
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <title>Transcript Image Upload</title>
 </head>
 <body>
-    <p>Upload file:</p>
-    <input id="file-upload-input" type="file">
-    <button type="button" id="file-upload-button">Upload</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h1>Upload an Image of a Transcript</h1><hr/>
+                <form>
+                    <div class="form-group">
+                        <input id="file-upload-input" type="file">
+                    </div>
+                    <button type="button" id="file-upload-button" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
     <script src="js/utils.js"></script>
     <script src="js/grab.js"></script>
     <script src="js/posts.js"></script>
@@ -15,6 +37,7 @@
             $('#file-upload-button').click(handleFileUploadClick);
             getApiToken(handleApiToken);
         });
+
         /**
          * Handle API response to request for a token
          * @param apiResponse return from get token request
@@ -23,11 +46,13 @@
             if(apiResponse.success){
                 //Received token - set to session
                 setToken(apiResponse.token);
+                console.log("Connected to API with token: " + apiResponse.token);
             } else {
                 //Server refused to give us a token
                 alert("Error: Server rejected connection");
             }
         };
+
         /**
          * Handle file upload button click
          */
@@ -49,11 +74,74 @@
                 console.log("Could not load image");
             }
         };
+
         /**
          * Handle the return of a file post request
          */
+<<<<<<< Updated upstream
         let handleFilePostResult = function(){
 
         }
+=======
+        let handleFilePostResult = function(apiResponse){
+            if(apiResponse.success){
+                let tableRows = apiResponse.classRecords;
+                //Get the field list from the API response
+                let fieldList = apiResponse.fieldArray;
+                //Construct the table element
+                constructClassTable(fieldList, tableRows);
+            }
+        };
+
+        let constructClassTable = function(fieldList){
+            let table = $('<table class="table-bordered table-hovered"></table>');
+            let tableHead = $('<thead></thead>');
+            let tableHeadRow = $('<tr></tr>');
+            //Create the header fields and append to the row
+            fieldList.forEach(function(fieldName, i, arr){
+                let fieldTitle = $('<th></th>').text(fieldName);
+                fieldTitle.appendTo(tableHeadRow);
+            });
+            //Append the row to the head element
+            tableHeadRow.appendTo(tableHead);
+            //Append the table head to the table
+            tableHead.appendTo(table);
+        };
+
+        let table = $('#results-table');
+
+        /**
+         * Create a table row element to correspond with the table row data element
+         * @param classData table row data element
+         */
+        let addTableRow = function(classData){
+            let tableRow = $('<tr class="class-table-row"></tr>');
+            //Prototypical field element, this will be cloned and put inside each row
+            let fieldElementPrototype = $('<input type="text" class="row-element form-control-plaintext">');
+            //For each field in row data, create a new element
+            classData.forEach(function(classField){
+                //Clone a new field element for this field object
+                let thisFieldElement = fieldElementPrototype.clone();
+                thisFieldElement.data("fieldTag", fieldTag);
+
+            });
+
+
+
+            let classNameElement = $('<input type="text" class="classname-row-element form-control-plaintext">');
+            let yearElement = $('<input type="text" class="year-row-element form-control-plaintext">');
+            let finalGradeElement = $('<input type="text" class="finalgrade-row-element form-control-plaintext">');
+            let creditsElement = $('<input type="text" class="credits-row-element form-control-plaintext">');
+            classNameElement.attr('placeholder', classData.classname);
+            classNameElement.appendTo($('<td></td>').appendTo(tableRow));
+            yearElement.attr('placeholder', classData.year);
+            yearElement.appendTo($('<td></td>').appendTo(tableRow));
+            finalGradeElement.attr('placeholder', classData.finalgrade);
+            finalGradeElement.appendTo($('<td></td>').appendTo(tableRow));
+            creditsElement.attr('placeholder', classData.credits);
+            creditsElement.appendTo($('<td></td>').appendTo(tableRow));
+            tableRow.appendTo(table);
+        };
+>>>>>>> Stashed changes
     </script>
 </body>
