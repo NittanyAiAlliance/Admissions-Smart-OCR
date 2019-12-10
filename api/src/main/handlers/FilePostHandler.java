@@ -2,6 +2,7 @@ package main.handlers;
 
 import com.sun.net.httpserver.HttpHandler;
 import main.types.Log;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -28,21 +29,29 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
         String dataFileName = writeImageToFile(imgBlobString);
         String scriptPath = System.getProperty("user.home");
         //Create invoke command for python script with image encoding as command line arg
-        ProcessBuilder pb = new ProcessBuilder("python", scriptPath + "/img-ocr.py", dataFileName);
+        //ProcessBuilder pb = new ProcessBuilder("python", scriptPath + "/img-ocr.py", dataFileName);
         try {
             //Invoke python script
-            Process p = pb.start();
-            BufferedReader pyIn = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            //Process p = pb.start();
+            //BufferedReader pyIn = new BufferedReader(new InputStreamReader(p.getInputStream()));
             StringBuilder csvString = new StringBuilder();
-            String csvLine = null;
+            String csvLine = "";
             //Read script return
-            p.waitFor();
-            while((csvLine = pyIn.readLine()) != null) {
+            //p.waitFor();
+            //while((csvLine = pyIn.readLine()) != null) {
                 System.out.println(csvLine);
                 csvString.append(csvLine);
-            }
+            //}
+            //TODO: remove before commit
             JSONObject csvStrObj = new JSONObject();
-            csvStrObj.put("csvStr", csvString.toString());
+            JSONArray classRecordArray = new JSONArray();
+            JSONObject classRecord = new JSONObject();
+            classRecord.put("classname", "Math");
+            classRecord.put("year", 1998);
+            classRecord.put("finalgrade", "A+");
+            classRecord.put("credits", 2);
+            classRecordArray.put(classRecord);
+            csvStrObj.put("classRecords", classRecordArray);
             returnActionSuccess(csvStrObj);
         } catch (Exception ex) {
             ex.printStackTrace();
