@@ -39,7 +39,7 @@ function sendRequest(node, req, onComplete){
         url : reqUrl,
         data : JSON.stringify(req),
         success : function(apiReturn) {
-            onComplete(apiReturn);
+            onComplete(JSON.parse(apiReturn));
         }
     });
 }
