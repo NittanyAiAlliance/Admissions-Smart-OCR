@@ -44,6 +44,12 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             //}
             //TODO: remove before commit
             JSONObject csvStrObj = new JSONObject();
+            JSONArray fieldArray = new JSONArray();
+            fieldArray.put("Class Name");
+            fieldArray.put("Year");
+            fieldArray.put("Final Grade");
+            fieldArray.put("Credits");
+            csvStrObj.put("fieldArray", fieldArray);
             JSONArray classRecordArray = new JSONArray();
             JSONObject classRecord = new JSONObject();
             classRecord.put("classname", "Math");
@@ -51,6 +57,12 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             classRecord.put("finalgrade", "A+");
             classRecord.put("credits", 2);
             classRecordArray.put(classRecord);
+            JSONObject class2Record = new JSONObject();
+            class2Record.put("classname", "Art");
+            class2Record.put("year", 1998);
+            class2Record.put("finalgrade", "B");
+            class2Record.put("credits", 4);
+            classRecordArray.put(class2Record);
             csvStrObj.put("classRecords", classRecordArray);
             returnActionSuccess(csvStrObj);
         } catch (Exception ex) {

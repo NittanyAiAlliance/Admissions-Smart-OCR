@@ -4,6 +4,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheet.css">
     <title>Transcript Image Upload</title>
 </head>
 <body>
@@ -22,11 +23,10 @@
             <div class="col-md-3"></div>
         </div>
         <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-8">
-
+            <div class="col-md-3"></div>
+            <div class="col-md-6" id="table-col">
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-md-3"></div>
         </div>
     </div>
     <script src="js/utils.js"></script>
@@ -78,69 +78,81 @@
         /**
          * Handle the return of a file post request
          */
-<<<<<<< Updated upstream
-        let handleFilePostResult = function(){
-        }
-=======
         let handleFilePostResult = function(apiResponse){
             if(apiResponse.success){
                 let tableRows = apiResponse.classRecords;
                 //Get the field list from the API response
                 let fieldList = apiResponse.fieldArray;
                 //Construct the table element
-                constructClassTable(fieldList, tableRows);
+                constructClassTable(fieldList);
+                tableRows.forEach(function(tableRow, i, arr){
+                    addTableRow(tableRow);
+                });
             }
         };
 
         let constructClassTable = function(fieldList){
-            let table = $('<table class="table-bordered table-hovered"></table>');
+            table = $('<table class="table-bordered table-hovered"></table>');
+            let instructions = $('<p>Here\'s what we found on your transcript. Click in any box to make corrections or use the controls below to add/remove classes</p>');
             let tableHead = $('<thead></thead>');
             let tableHeadRow = $('<tr></tr>');
             //Create the header fields and append to the row
-            fieldList.forEach(function(fieldName, i, arr){
-                let fieldTitle = $('<th></th>').text(fieldName);
+            for(let i = 0; i < fieldList.length; i++){
+                let fieldTitle = $('<th></th>').text(fieldList[i]);
                 fieldTitle.appendTo(tableHeadRow);
-            });
+            }
             //Append the row to the head element
             tableHeadRow.appendTo(tableHead);
             //Append the table head to the table
             tableHead.appendTo(table);
+            let tableCol = $('#table-col');
+            let addClassButton = $('<button id="add-class-button" class="btn btn-primary">Add</button>');
+            let removeClassButton = $('<button id="remove-class-button" class="btn btn-primary">Remove</button>');
+            let submitChangesButton = $('<button id="submit-changes-button" class="btn btn-primary">Confirm and Submit</button>');
+            addClassButton.click(handleAddClick);
+            removeClassButton.click(handleRemoveClick);
+            submitChangesButton.click(handleSubmitChangesClick);
+            tableCol.empty();
+            tableCol.append(instructions);
+            tableCol.append(table);
+            tableCol.append(addClassButton);
+            tableCol.append(removeClassButton);
+            tableCol.append(submitChangesButton);
         };
 
-        let table = $('#results-table');
+        let handleAddClick = function(){
+            alert("This feature is coming soon to order on video and DVD");
+        };
+
+        let handleRemoveClick = function(){
+            alert("This feature is coming soon to order on vidoe and DVD");
+        };
+
+        let handleSubmitChangesClick = function(){
+            alert("Submitted changes");
+        };
+
+        let table;
 
         /**
          * Create a table row element to correspond with the table row data element
          * @param classData table row data element
          */
         let addTableRow = function(classData){
-            let tableRow = $('<tr class="class-table-row"></tr>');
+            let tableRow = $('<tr class="class-table-row"></tr>').clone();
             //Prototypical field element, this will be cloned and put inside each row
             let fieldElementPrototype = $('<input type="text" class="row-element form-control-plaintext">');
             //For each field in row data, create a new element
-            classData.forEach(function(classField){
+            Object.entries(classData).forEach(function(classField, i, arr){
                 //Clone a new field element for this field object
                 let thisFieldElement = fieldElementPrototype.clone();
+                let fieldTag = classField[0];
+                thisFieldElement.attr("placeholder", classField[1]);
                 thisFieldElement.data("fieldTag", fieldTag);
-
+                let thisFieldDOM = $('<td></td>').append(thisFieldElement);
+                thisFieldDOM.appendTo(tableRow);
+                tableRow.appendTo(table);
             });
-
-
-
-            let classNameElement = $('<input type="text" class="classname-row-element form-control-plaintext">');
-            let yearElement = $('<input type="text" class="year-row-element form-control-plaintext">');
-            let finalGradeElement = $('<input type="text" class="finalgrade-row-element form-control-plaintext">');
-            let creditsElement = $('<input type="text" class="credits-row-element form-control-plaintext">');
-            classNameElement.attr('placeholder', classData.classname);
-            classNameElement.appendTo($('<td></td>').appendTo(tableRow));
-            yearElement.attr('placeholder', classData.year);
-            yearElement.appendTo($('<td></td>').appendTo(tableRow));
-            finalGradeElement.attr('placeholder', classData.finalgrade);
-            finalGradeElement.appendTo($('<td></td>').appendTo(tableRow));
-            creditsElement.attr('placeholder', classData.credits);
-            creditsElement.appendTo($('<td></td>').appendTo(tableRow));
-            tableRow.appendTo(table);
         };
->>>>>>> Stashed changes
     </script>
 </body>
