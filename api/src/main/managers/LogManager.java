@@ -37,7 +37,7 @@ public class LogManager {
             database.nonQuery(writeLogStmt);
         } catch (SQLException sqlEx) {
             //Something went wrong - log the error to the error output
-            this.writeErrorLog(new ErrorLog(sqlEx, "Writing transaction log failed"));
+            writeErrorLog(new ErrorLog(sqlEx, "Writing transaction log failed"));
         }
     }
 
