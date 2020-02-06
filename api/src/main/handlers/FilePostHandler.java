@@ -8,6 +8,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,49 +27,35 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
     @Override
     public void fulfillRequest(JSONObject requestParams) {
         //Get image file string from request parameters
-        String imgBlobString = requestParams.getString("file");
-        //Write image data to file
-        String dataFileName = writeImageToFile(imgBlobString);
-        String scriptPath = System.getProperty("user.home");
-        //Create invoke command for python script with image encoding as command line arg
-        //ProcessBuilder pb = new ProcessBuilder("python", scriptPath + "/img-ocr.py", dataFileName);
-        try {
-            //Invoke python script
-            //Process p = pb.start();
-            //BufferedReader pyIn = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            StringBuilder csvString = new StringBuilder();
-            String csvLine = "";
-            //Read script return
-            //p.waitFor();
-            //while((csvLine = pyIn.readLine()) != null) {
-                System.out.println(csvLine);
-                csvString.append(csvLine);
-            //}
-            //TODO: remove before commit
-            JSONObject csvStrObj = new JSONObject();
-            JSONArray fieldArray = new JSONArray();
-            fieldArray.put("Class Name");
-            fieldArray.put("Year");
-            fieldArray.put("Final Grade");
-            fieldArray.put("Credits");
-            csvStrObj.put("fieldArray", fieldArray);
-            JSONArray classRecordArray = new JSONArray();
-            JSONObject classRecord = new JSONObject();
-            classRecord.put("classname", "Math");
-            classRecord.put("year", 1998);
-            classRecord.put("finalgrade", "A+");
-            classRecord.put("credits", 2);
-            classRecordArray.put(classRecord);
-            JSONObject class2Record = new JSONObject();
-            class2Record.put("classname", "Art");
-            class2Record.put("year", 1998);
-            class2Record.put("finalgrade", "B");
-            class2Record.put("credits", 4);
-            classRecordArray.put(class2Record);
-            csvStrObj.put("classRecords", classRecordArray);
-            returnActionSuccess(csvStrObj);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        String imgStr = requestParams.getString("file");
+        String urlWithParams = "http://localhost:5000?img_str=" + imgStr;
+        //Create OCR API request
+        try{
+            String ocrCsv = getOCRRequest(urlWithParams);
+            System.out.println(ocrCsv);
+        } catch (IOException ioEx){
+            ioEx.printStackTrace();
+        }
+
+    }
+
+    private String getOCRRequest(String reqUrl) throws IOException{
+        //Create connection to local OCR api
+        HttpURLConnection httpClient = (HttpURLConnection) new URL(reqUrl).openConnection();
+        httpClient.setRequestMethod("GET");
+        httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+        int responseCode = httpClient.getResponseCode();
+        if(responseCode != 200){
+            System.out.println("Could not connect to internal API");
+        }
+        //Read request response ~ expecting OCR csv
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(httpClient.getInputStream()))){
+            StringBuilder response = new StringBuilder();
+            String line;
+            while((line = in.readLine()) != null){
+                response.append(line);
+            }
+            return response.toString();
         }
     }
 
