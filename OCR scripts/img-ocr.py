@@ -5,6 +5,16 @@ import io
 from io import BytesIO
 import sys
 from pprint import pprint
+from flask import Flask, request, json
+
+
+api = Flask(__name__)
+
+@api.route('/', methods=['GET'])
+def process_transcript():
+    img_str = request.args.get("img_str")
+    table_csv = get_table_csv_results(bytearray(img_str))
+    return table_csv
 
 
 def get_rows_columns_map(table_result, blocks_map):
@@ -40,12 +50,7 @@ def get_text(result, blocks_map):
     return text
 
 
-def get_table_csv_results(file_name):
-    with open(file_name, 'rb') as file:
-        img_test = file.read()
-        bytes_test = bytearray(img_test)
-        print('Image loaded', file_name)
-
+def get_table_csv_results(bytes_test):
     # process using image bytes
     # get the results
     client = boto3.client('textract',region_name='us-east-2')
@@ -92,19 +97,5 @@ def generate_table_csv(table_result, blocks_map, table_index):
     return csv
 
 
-def main(file_name):
-    table_csv = get_table_csv_results(file_name)
-
-    output_file = 'output.csv'
-
-    # replace content
-    with open(output_file, "wt") as fout:
-        fout.write(table_csv)
-
-    # show the results
-    print('CSV OUTPUT FILE: ', output_file)
-
-
 if __name__ == "__main__":
-    file_name = sys.argv[1]
-    main(file_name)
+    api.run()
