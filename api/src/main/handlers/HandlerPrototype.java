@@ -3,8 +3,10 @@ package main.handlers;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import main.managers.LogManager;
+import main.types.ErrorLog;
 import main.types.ILoggable;
 import main.types.Log;
+import main.types.LogType;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -44,46 +46,68 @@ public abstract class HandlerPrototype implements ILoggable {
     }
 
     void displayRequestValidity(boolean isValidRequest){
-        if(isValidRequest){
-            this.log.addContent("Valid Request");
-        } else {
-            this.log.addContent("Invalid Request");
-        }
+        this.log.setRequestValidity(isValidRequest);
+        //Display to server console ~ debugging TODO: remove for production
+        System.out.println(isValidRequest ? "Valid Request" : "Invalid Request");
     }
 
+    /**
+     * Validate authentication token from request
+     * @param token token string from request parameters
+     * @return does this token match the API authentication code?
+     */
     private boolean isTokenValid(String token){
-        try{
+        try {
+            //Load authentication properties from auth file
             Properties verificationProps = new Properties();
             verificationProps.load(getClass().getResourceAsStream("auth.properties"));
+            //Hash authentication key from auth file to SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(verificationProps.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
             String serverToken = Base64.getEncoder().encodeToString(hash);
+            //Compare hashed token to request parameter
             if(token.equals(serverToken)){
-                this.log.addContent("Token " + token + " was verified");
+                this.log.setHashVerifyValidity(true);
                 return true;
             } else {
-                this.log.addContent("Token " + token + " was not verified");
+                this.log.setHashVerifyValidity(false);
                 return false;
             }
         } catch (Exception ex){
+            ErrorLog errorLog = new ErrorLog(ex, "Fatal error in token validation");
             return false;
         }
     }
 
+    /**
+     * Determine request parameters and tokenization validity
+     * @param requestParams JSON object containing the parameters sent with the request
+     * @return does the request have parameters, do the have all the required parameters, and does it have a valid token?
+     */
     protected boolean isRequestValid(JSONObject requestParams) {
         if (requestParams == null) {
             //Request did not come with parameters, is invalid
-            this.log.addContent("Request Params Null");
+            this.log.setContent("Missing request params");
+            this.log.setRequestValidity(false);
+            this.log.setHashVerifyValidity(false);
             return false;
+        }
+        //Determine log validity and log
+        boolean isRequestValid = !requestParams.has("token") || isTokenValid(requestParams.getString("token"));
+        this.log.setRequestValidity(isRequestValid);
+        if(!isRequestValid){
+            this.log.setContent("Invalid token");
+            this.log.setHashVerifyValidity(false);
         }
         for (String requiredKey : requiredKeys) {
             if (!requestParams.has(requiredKey)) {
                 //Missing a required key, request is invalid
-                this.log.addContent("Request Params Missing Key " + requiredKey);
+                this.log.setContent("Missing required key : " + requiredKey);
+                this.log.setRequestValidity(false);
                 return false;
             }
         }
-        return !requestParams.has("token") || isTokenValid(requestParams.getString("token"));
+        return isRequestValid;
     }
 
     /**
@@ -92,6 +116,7 @@ public abstract class HandlerPrototype implements ILoggable {
      * @throws IOException thrown if there is an issue with writing response data to client
      */
     public void handle(HttpExchange httpExchange) throws IOException {
+        //Create a new log for this handler transaction
         this.log = new Log();
         //Get parameters from client
         JSONObject requestParams = getParameterObject(httpExchange);
@@ -102,6 +127,7 @@ public abstract class HandlerPrototype implements ILoggable {
         if (isValidRequest) {
             //Request was valid, fulfill the request with params
             fulfillRequest(requestParams);
+            this.log.setContent(this.response);
         } else {
             //Request was invalid, set response to reflect this
             this.response = "invalid request";
@@ -111,16 +137,24 @@ public abstract class HandlerPrototype implements ILoggable {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        this.log.addContent("RETURN=" + this.response);
-        logManager.writeLog(this.log);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
+        //Commit the log of this transaction to the database
+        this.logManager.writeLog(this.log);
     }
 
+    /**
+     * Abstract fulfill request method fragment, forces handler override
+     * @param requestParams parameters associated with the request
+     */
     public abstract void fulfillRequest(JSONObject requestParams);
 
+    /**
+     * Getter for response property
+     * @return response property
+     */
     public String getResponse(){
         return this.response;
     }

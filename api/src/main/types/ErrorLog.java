@@ -36,25 +36,10 @@ public class ErrorLog extends Log {
     }
 
     /**
-     * Override to string to create error log content
-     * @return error log content string
+     * Commit this error log to the database
      */
-    @Override
-    public String toString(){
-        //Construct error log content string
-        StringBuilder logString = new StringBuilder("ERROR=");
-        //Get the type string
-        logString.append(LogType.values()[super.getType().ordinal()].toString());
-        logString.append("|CONTENT=");
-        logString.append(super.getContent());
-        logString.append("|MESSAGE=");
-        logString.append(this.getErrorMessage());
-        logString.append("|STACKTRACE=");
-        //Get the invoking stacktrace string
-        String invokingExceptionStacktraceString = getInvokingExceptionStacktraceString();
-        logString.append(invokingExceptionStacktraceString);
-        logString.append("\n");
-        return logString.toString();
+    public void commit(){
+        this.setContent(getInvokingExceptionStacktraceString());
     }
 
     /**
