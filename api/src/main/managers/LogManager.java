@@ -23,16 +23,18 @@ public class LogManager {
 
     /**
      * Write a standard transaction log to the database
-     * @param thisLog
+     * @param thisLog log object to write
      */
     public void writeLog(Log thisLog){
         //Prepare log write statement
-        String writeLogSql = "INSERT INTO TRANSACTION_LOGS(TYPE, CONTENT, TIMESTAMP) VALUES (?, ?, ?)";
+        String writeLogSql = "INSERT INTO TRANSACTION_LOGS(TYPE, REQUEST_VALIDITY, HASH_VERIFY_VALIDITY, RESPONSE_CONTENT, TIMESTAMP) VALUES (?, ?, ?, ?, ?);";
         PreparedStatement writeLogStmt = database.prepareStatement(writeLogSql);
         try {
             writeLogStmt.setInt(1, thisLog.getType().ordinal());
-            writeLogStmt.setString(2, thisLog.getContent());
-            writeLogStmt.setTimestamp(3, new Timestamp(thisLog.getTimestamp().getTime()));
+            writeLogStmt.setBoolean(2, thisLog.getRequestValidity());
+            writeLogStmt.setBoolean(3, thisLog.getHashVerifyValidity());
+            writeLogStmt.setString(4, thisLog.getContent());
+            writeLogStmt.setTimestamp(5, new Timestamp(thisLog.getTimestamp().getTime()));
             //Run log entry statement
             database.nonQuery(writeLogStmt);
         } catch (SQLException sqlEx) {

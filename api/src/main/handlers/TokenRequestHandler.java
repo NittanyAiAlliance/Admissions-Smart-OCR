@@ -37,22 +37,23 @@ public class TokenRequestHandler extends HandlerPrototype implements HttpHandler
             verificationDigestProperties.load(getClass().getResourceAsStream("auth.properties"));
             byte[] hash = digest.digest(verificationDigestProperties.getProperty("verificationKey").getBytes(StandardCharsets.UTF_8));
             token = Base64.getEncoder().encodeToString(hash);
-            this.log.addContent("Hash verification token succeeded");
+            //this.log.addContent("Hash verification token succeeded");
         } catch (NoSuchAlgorithmException | IOException nsaEx){
             returnActionFailure();
             ErrorLog errorLog = new ErrorLog(nsaEx, "Hash verification token failed");
             LogManager.writeErrorLog(errorLog);
-            this.log.addContent(errorLog.toString());
+            //this.log.addContent(errorLog.toString());
         }
         return token;
     }
     /**
-     * Overriden request validation method. Requests for tokens are always valid
+     * Overridden request validation method. Requests for tokens are always valid
      * @param requestParams This will be null as there are no request parameters
      * @return true - always.
      */
     @Override
     protected boolean isRequestValid(JSONObject requestParams) {
+        this.log.setHashVerifyValidity(false);
         return true;
     }
 }
