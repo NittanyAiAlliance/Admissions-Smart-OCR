@@ -6,13 +6,14 @@ from io import BytesIO
 import sys
 from pprint import pprint
 from flask import Flask, request, json
-
+import base64
 
 api = Flask(__name__)
 
-@api.route('/', methods=['GET'])
+@api.route('/', methods=['POST'])
 def process_transcript():
-    img_str = request.args.get("img_str")
+    img_str = request.get_json('img_str')['file']
+    img_str = base64.b64decode(img_str)
     table_csv = get_table_csv_results(bytearray(img_str))
     return table_csv
 
