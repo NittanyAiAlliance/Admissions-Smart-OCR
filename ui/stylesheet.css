@@ -1,3 +1,124 @@
-#table-col {
-    padding-top : 50px;
+body {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#transcript-upload {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+#transcript-upload + label {
+    padding-top: 10px;
+    text-align: center;
+    height: 100%;
+}
+
+#transcript-upload + label:hover {
+    cursor: pointer;
+    color: #004080;
+}
+
+#upload-container{
+    min-height: 50vh;
+    max-height: 100vh;
+    padding: 16px;
+    margin-bottom: 16px;
+    margin-top: 16px;
+    width: 100%;
+    background-color: #f2f2f2;
+}
+
+#drag-drop-container{
+    height: 100%;
+    border: 1px solid #bfbfbf;
+}
+
+#upload-container.is-drag-over{
+    background-color: white;
+    border: 1px dashed #bfbfbf;
+}
+
+.navbar-dark {
+    background-color: #00264d !important;
+    margin-bottom: 16px;
+}
+
+.navbar-brand {
+    color: white !important;
+}
+
+.btn-outline-primary{
+    color: #00254d !important;
+    border-color: #00254d !important;
+}
+
+.btn-outline-primary:hover{
+    background-color: #00254d !important;
+    color: white !important;
+}
+
+.info-display-text{
+    border: none;
+    border-bottom: 1px solid #00254d !important;
+    background-color: transparent;
+    color: #00254d !important;
+    line-height: 25%;
+    width: 100%;
+}
+
+.info-display-text:active{
+    border: 2px solid #00254d !important;
+    border-radius: 1px;
+}
+
+.info-display-label {
+    font-size: small !important;
+}
+
+.info-container-title{
+    padding-left: 16px;
+}
+
+.info-container{
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding-top: 32px;
+    border-radius: 5%;
+}
+
+.info-container{
+    margin-bottom: 32px;
+    margin-top: 16px;
+}
+
+#review-content{
+    margin: 32px;
+}
+
+#review-data-row{
+    margin-top: 32px;
+}
+
+#review-classes-container{
+    padding-left: 64px !important;
+}
+
+.class-listing {
+    padding-top: 8px;
+}
+
+.year-listing {
+    padding: 32px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 16px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.drag-class-handle:hover {
+    cursor: grab;
 }

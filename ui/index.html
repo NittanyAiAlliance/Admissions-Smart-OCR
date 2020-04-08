@@ -4,155 +4,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="stylesheet.css">
-    <title>Transcript Image Upload</title>
 </head>
 <body>
+    <nav class="navbar navbar-expand-sm bg-light navbar-dark">
+        <a class="navbar-brand">Penn State Undergraduate Application</a>
+    </nav>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <h1>Upload an Image of a Transcript</h1><hr/>
-                <form>
-                    <div class="form-group">
-                        <input id="file-upload-input" type="file">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <p class="default-instructions">As part of the application process, you will share your academic record from high school. Select the upload button and an image or PDF file of your transcript to begin. After your upload, you will have the chance to verify all information is correct.</p>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <div class="row justify-content-center h-100">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <form id="upload-container">
+                    <div class="container-fluid d-flex">
+                        <div class="row justify-content-center align-self-center w-100">
+                            <i id="upload-icon" class="material-icons">cloud_upload</i>
+                            <input id="transcript-upload" name="files[]" type="file">
+                            <label class="w-100" for="transcript-upload"><strong>Choose a file</strong><span id="can-drag-drop"> or drag it here</span>.</label>
+                        </div>
                     </div>
-                    <button type="button" id="file-upload-button" class="btn btn-primary">Upload</button>
                 </form>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-lg-2"></div>
         </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6" id="table-col">
-            </div>
-            <div class="col-md-3"></div>
+        <div class="row justify-content-center">
+            <button id="upload-next-button" class="btn btn-outline-primary">Next >>></button>
         </div>
     </div>
     <script src="js/utils.js"></script>
     <script src="js/grab.js"></script>
     <script src="js/posts.js"></script>
     <script>
-        $(document).ready(function(){
-            $('#file-upload-button').click(handleFileUploadClick);
-            getApiToken(handleApiToken);
+        var hasDroppedFile = false;
+        var uploadForm = $('#upload-container');
+        var droppedFile;
+
+        uploadForm.on('drag dragstart dragend dragover dragenter dragleave drop', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+        }).on('dragover dragenter', function(){
+            uploadForm.addClass('is-drag-over');
+        }).on('dragleave dragend drop', function(){
+            uploadForm.removeClass('is-drag-over')
+        }).on('drop', function(e){
+            droppedFile = e.originalEvent.dataTransfer.files;
         });
 
-        /**
-         * Handle API response to request for a token
-         * @param apiResponse return from get token request
-         */
-        let handleApiToken = function(apiResponse){
-            if(apiResponse.success){
-                //Received token - set to session
-                setToken(apiResponse.token);
-                console.log("Connected to API with token: " + apiResponse.token);
-            } else {
-                //Server refused to give us a token
-                alert("Error: Server rejected connection");
-            }
-        };
-
-        /**
-         * Handle file upload button click
-         */
-        let handleFileUploadClick = function(){
-            //Get file from DOM element
-            let fileEntry = $('#file-upload-input').prop("files")[0];
-            let fileReader = new FileReader();
+        $('#upload-next-button').click(function(){
+            var fileEntry = $('#transcript-upload').prop("files")[0];
+            var fileReader = new FileReader();
             fileReader.addEventListener("load", function(){
-                //File has been loaded ~ send to server
-                let file = fileReader.result;
+                var file = fileReader.result;
                 sendFilePost(file, handleFilePostResult);
             });
-            //Load file if it exists
             if(fileEntry){
                 //File exists - read
                 fileReader.readAsDataURL(fileEntry);
-            } else {
-                //File does not exist
-                console.log("Could not load image");
             }
-        };
+        });
 
-        /**
-         * Handle the return of a file post request
-         */
-        let handleFilePostResult = function(apiResponse){
-            if(apiResponse.success){
-                let tableRows = apiResponse.classRecords;
-                //Get the field list from the API response
-                let fieldList = apiResponse.fieldArray;
-                //Construct the table element
-                constructClassTable(fieldList);
-                tableRows.forEach(function(tableRow, i, arr){
-                    addTableRow(tableRow);
-                });
-            }
-        };
-
-        let constructClassTable = function(fieldList){
-            table = $('<table class="table-bordered table-hovered"></table>');
-            let instructions = $('<p>Here\'s what we found on your transcript. Click in any box to make corrections or use the controls below to add/remove classes</p>');
-            let tableHead = $('<thead></thead>');
-            let tableHeadRow = $('<tr></tr>');
-            //Create the header fields and append to the row
-            for(let i = 0; i < fieldList.length; i++){
-                let fieldTitle = $('<th></th>').text(fieldList[i]);
-                fieldTitle.appendTo(tableHeadRow);
-            }
-            //Append the row to the head element
-            tableHeadRow.appendTo(tableHead);
-            //Append the table head to the table
-            tableHead.appendTo(table);
-            let tableCol = $('#table-col');
-            let addClassButton = $('<button id="add-class-button" class="btn btn-primary">Add</button>');
-            let removeClassButton = $('<button id="remove-class-button" class="btn btn-primary">Remove</button>');
-            let submitChangesButton = $('<button id="submit-changes-button" class="btn btn-primary">Confirm and Submit</button>');
-            addClassButton.click(handleAddClick);
-            removeClassButton.click(handleRemoveClick);
-            submitChangesButton.click(handleSubmitChangesClick);
-            tableCol.empty();
-            tableCol.append(instructions);
-            tableCol.append(table);
-            tableCol.append(addClassButton);
-            tableCol.append(removeClassButton);
-            tableCol.append(submitChangesButton);
-        };
-
-        let handleAddClick = function(){
-            alert("This feature is coming soon to order on video and DVD");
-        };
-
-        let handleRemoveClick = function(){
-            alert("This feature is coming soon to order on vidoe and DVD");
-        };
-
-        let handleSubmitChangesClick = function(){
-            alert("Submitted changes");
-        };
-
-        let table;
-
-        /**
-         * Create a table row element to correspond with the table row data element
-         * @param classData table row data element
-         */
-        let addTableRow = function(classData){
-            let tableRow = $('<tr class="class-table-row"></tr>').clone();
-            //Prototypical field element, this will be cloned and put inside each row
-            let fieldElementPrototype = $('<input type="text" class="row-element form-control-plaintext">');
-            //For each field in row data, create a new element
-            Object.entries(classData).forEach(function(classField, i, arr){
-                //Clone a new field element for this field object
-                let thisFieldElement = fieldElementPrototype.clone();
-                let fieldTag = classField[0];
-                thisFieldElement.attr("placeholder", classField[1]);
-                thisFieldElement.data("fieldTag", fieldTag);
-                let thisFieldDOM = $('<td></td>').append(thisFieldElement);
-                thisFieldDOM.appendTo(tableRow);
-                tableRow.appendTo(table);
-            });
-        };
+        var handleFilePostResult = function(parseReturn){
+            //TODO: validate we actually got something back
+            sessionStorage.setItem("parseResult", JSON.stringify(parseReturn));
+            window.location.href = "review_transcript.html";
+        }
     </script>
 </body>
