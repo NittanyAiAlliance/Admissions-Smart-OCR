@@ -4,7 +4,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
+    <nav class="navbar navbar-expand-sm bg-light navbar-dark">
+        <a class="navbar-brand">Penn State Undergraduate Application</a>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <p class="default-instructions">As part of the application process, you will share your academic record from high school. Select the upload button and an image or PDF file of your transcript to begin. After your upload, you will have the chance to verify all information is correct.</p>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <div class="row justify-content-center h-100">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <form id="upload-container">
+                    <div class="container-fluid d-flex">
+                        <div class="row justify-content-center align-self-center w-100">
+                            <i id="upload-icon" class="material-icons">cloud_upload</i>
+                            <input id="transcript-upload" name="files[]" type="file">
+                            <label class="w-100" for="transcript-upload"><strong>Choose a file</strong><span id="can-drag-drop"> or drag it here</span>.</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <div class="row justify-content-center">
+            <button id="upload-next-button" class="btn btn-outline-primary">Next >>></button>
+        </div>
+    </div>
+    <script src="js/utils.js"></script>
+    <script src="js/grab.js"></script>
+    <script src="js/posts.js"></script>
+    <script>
+        var hasDroppedFile = false;
+        var uploadForm = $('#upload-container');
+        var droppedFile;
+
+        uploadForm.on('drag dragstart dragend dragover dragenter dragleave drop', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+        }).on('dragover dragenter', function(){
+            uploadForm.addClass('is-drag-over');
+        }).on('dragleave dragend drop', function(){
+            uploadForm.removeClass('is-drag-over')
+        }).on('drop', function(e){
+            droppedFile = e.originalEvent.dataTransfer.files;
+        });
+
+        $('#upload-next-button').click(function(){
+            var fileEntry = $('#transcript-upload').prop("files")[0];
+            var fileReader = new FileReader();
+            fileReader.addEventListener("load", function(){
+                var file = fileReader.result;
+                sendFilePost(file, handleFilePostResult);
+            });
+            if(fileEntry){
+                //File exists - read
+                fileReader.readAsDataURL(fileEntry);
+            }
+        });
+
+        var handleFilePostResult = function(parseReturn){
+            //TODO: validate we actually got something back
+            sessionStorage.setItem("parseResult", JSON.stringify(parseReturn));
+            window.location.href = "review_transcript.html";
+        }
+    </script>
 </body>

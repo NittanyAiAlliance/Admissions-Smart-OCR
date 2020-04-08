@@ -1,5 +1,5 @@
 //API URL ADDRESS
-const apiUrl = "https://localhost:2020";
+const apiUrl = "http://3.15.215.137:2020";
 //API ENDPOINT MAP
 let apiNodeMap = {
     getToken : "/token/get",
@@ -59,5 +59,5 @@ function setToken(token){
 }
 
 function getToken(req){
-    return sessionStorage.getItem("token");
+    return "Q9O/dH4FGf5V+K5GxOzo1Cu3S6gKobbg9XMuElCv6u8=";
 }

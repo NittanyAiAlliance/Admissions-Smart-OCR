@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-light navbar-dark">
+        <a class="navbar-brand">Penn State Undergraduate Application</a>
+    </nav>
+    <div class="container-fluid" id="review-content">
+        <div class="row">
+            <p class="w-100 text-center">Please review the information we have gathered from your transcript and make any necessary corrections</p>
+        </div>
+        <div class="row" id="review-data-row">
+            <div class="col-lg-3">
+                <h4 class="info-container-title">Your Info</h4>
+                <div class="container info-container" id="personal-info">
+                    <form>
+                        <div class="form-group">
+                            <input id="pi-name" class="info-display-text"><br/>
+                            <label class="info-display-label" for="pi-name">name</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="pi-address" class="info-display-text"><br/>
+                            <label class="info-display-label" for="pi-address">address</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="pi-gpa" class="info-display-text"><br/>
+                            <label class="info-display-label" for="pi-gpa">GPA</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="pi-sat-score" class="info-display-text"><br/>
+                            <label class="info-display-label" for="pi-sat-score">SAT score</label>
+                        </div>
+                    </form>
+                </div>
+                <h4 class="info-container-title">Your High School</h4>
+                <div class="container info-container" id="high-school-info">
+                    <form>
+                        <div class="form-group">
+                            <input id="hs-name" class="info-display-text"><br/>
+                            <label class="info-display-label" for="hs-name">name</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="hs-address" class="info-display-text"><br/>
+                            <label class="info-display-label" for="hs-address">address</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="hs-phone" class="info-display-text"><br/>
+                            <label class="info-display-label" for="hs-phone">phone</label>
+                        </div>
+                        <div class="form-group">
+                            <input id="hs-ceeb" class="info-display-text"><br/>
+                            <label class="info-display-label" for="hs-ceeb">CEEB Code</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div id="review-classes-container" class="container-fluid">
+                    <div class="row">
+                        <h4 class="w-100">Your Classes<hr/></h4>
+                    </div>
+                    <div class="row">
+                        <div class="container-fluid" id="class-listing-container">
+                            <!-- Classes are appended here by script as they are created-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            let ocrJson = JSON.parse(sessionStorage.getItem("parseResult"));
+            //Set the personal information column DOM
+            //parsePersonalInformation(ocrJson);
+            //Create the year blocks in the class review DOM
+            parseSchoolYears(ocrJson);
+        });
+
+        let parseSchoolYears = function(ocrJson){
+            let years = ocrJson.classYears;
+            //Load the year listing prototype fragment
+            let yearPrototype = $('<div class="container-fluid year-listing"></div>');
+            yearPrototype.load("frags/year-listing.html", function(){
+                //Create a clone of the year listing fragment for each defined year
+                for(let i = 0; i < years.length; i++){
+                    let thisYear = years[i];
+                    addYearListing(thisYear, yearPrototype.clone());
+                }
+            });
+        };
+
+        /**
+         * Create an individual year listing
+         * @param year the year data object, containing classes taken within a specific school year
+         * @param yearDOM the DOM object for the year prototype
+         */
+        let addYearListing = function(year, yearDOM){
+            yearDOM.find('.year-label').text(year.name);
+            let classContainer = yearDOM.find('.class-container');
+            let classes = year.classes;
+            let classPrototype = $('<div class="container-fluid class-listing"></div>');
+            classPrototype.load("frags/class-listing.html", function(){
+                //Create a clone of the class listing fragment for each defined class within the year
+                for(let i = 0; i < classes.length; i++){
+                    let thisClass = classes[i];
+                    let thisClassListing = createClassListing(thisClass, classPrototype.clone());
+                    //Append the entire class (including the container) to the year object
+                    thisClassListing.appendTo(classContainer);
+                }
+                yearDOM.appendTo($('#class-listing-container'));
+            });
+        };
+
+        /**
+         * Create a class listing DOM object from a specific class and a DOM element
+         * @param thisClass class object the listing is being created for
+         * @param classDOM class listing prototype object
+         * @return class DOM object to be appended to the year container
+         */
+        let createClassListing = function(thisClass, classDOM){
+            classDOM.find('.class-name').val(thisClass.name);
+            classDOM.find('.class-grade').val(thisClass.grade);
+            classDOM.find('.class-credits').val(thisClass.credits);
+            classDOM.find('.class-weight').val(thisClass.weight);
+            return classDOM;
+        };
+
+        /**
+         * Retrieve the personal information from the transcript OCR result
+         * @param ocrJson JSON object return from the backend
+         */
+        let parsePersonalInformation = function(ocrJson){
+            let student = ocrJson.student;
+            let highSchool = ocrJson.highSchool;
+            displayStudentData(student);
+            displayHighSchoolData(highSchool);
+        };
+
+        /**
+         * Set the student information to the DOM
+         * @param student object containing the returned student data
+         */
+        let displayStudentData = function(student){
+            $('#pi-name').val(student.name);
+            $('#pi-address').val(student.address);
+            $('#pi-gpa').val(student.gpa);
+            $('#pi-sat-score').val(student.sat);
+        };
+
+        /**
+         * Set the high school information to the DOM
+         * @param highSchool high school object containing the returned high school data
+         */
+        let displayHighSchoolData = function(highSchool){
+            $('#hs-name').val(highSchool.name);
+            $('#hs-address').val(highSchool.address);
+            $('#hs-phone').val(highSchool.phone);
+            $('#hs-ceeb').val(highSchool.ceeb);
+        };
+    </script>
+</body>
