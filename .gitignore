@@ -28,3 +28,4 @@ OCR scripts/.idea/OCR scripts.iml
 OCR scripts/.idea/modules.xml
 OCR scripts/.idea/misc.xml
 OCR scripts/.idea/encodings.xml
+api/src/main/managers/server_storage.properties
