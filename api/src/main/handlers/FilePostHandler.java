@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpHandler;
 import main.types.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import sun.misc.BASE64Decoder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
