@@ -1,86 +1,42 @@
 package main.types;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Class to encapsulate field data
  */
 public class Field {
-    private String name, value;
-    private boolean isEdited;
-    private List<FieldVersion> versions;
+    private String expected, actual;
 
     /**
-     * Constructor to create a default field
-     * @param fieldRecord JSON representation of the field
+     * Default constructor
+     * @param expected expected value ~ what did the OCR think the field was?
+     * @param actual actual value ~ what did the user submit as the actual value of that field?
      */
-    public Field(JSONObject fieldRecord){
-        this.name = fieldRecord.getString("name");
-        //Determine if this field has been edited or not
-        if(fieldRecord.has("versions")){
-            //There are several versions of this field as it has been edited
-            this.isEdited = true;
-            this.versions = getFieldVersions(fieldRecord);
-        } else {
-            //There is but one version of this field, it is current
-            this.isEdited = false;
-            this.versions = new ArrayList<>();
-            //Add the only version that exists to the version list
-            this.versions.add(new FieldVersion(fieldRecord));
-        }
+    public Field(String expected, String actual){
+        this.expected = expected;
+        this.actual = actual;
     }
 
     /**
-     * Get the versions of an edited field
-     * @param fieldRecord field record object containing separate versions
-     * @return list of the versions objects within this field
+     * Getter for validity of this field ~ that is ~ did the actual field value match the expected
+     * @return does the actual field value match expected field value?
      */
-    private List<FieldVersion> getFieldVersions(JSONObject fieldRecord){
-        JSONArray fieldVersionArr = fieldRecord.getJSONArray("versions");
-        List<FieldVersion> versions = new ArrayList<>();
-        for(int i = 0; i < fieldVersionArr.length(); i ++) {
-            versions.add(new FieldVersion(fieldVersionArr.getJSONObject(i)));
-        }
-        return versions;
+    public boolean getValuesMatch(){
+        return this.expected.equals(this.actual);
     }
 
     /**
-     * Get if this field has been edited or not
-     * @return if this field has been edited or not
+     * Getter for expected property
+     * @return expected property
      */
-    public boolean getIsEdited(){
-        return this.isEdited;
+    public String getExpected(){
+        return this.expected;
     }
 
     /**
-     * Get the current version of the field
-     * @return current field version
+     * Getter for actual property
+     * @return actual property
      */
-    public FieldVersion getCurrentVersion(){
-        //Find the current field from the fields list
-        for(FieldVersion thisVersion : this.versions){
-            if(thisVersion.getIsCurrent()){
-                return thisVersion;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the expected version of the field - that is, the version that the parser sent to the front end
-     * @return expected field version
-     */
-    public FieldVersion getExpectedVersion(){
-        //Find the non current field from the fields list
-        for(FieldVersion thisVersion : this.versions){
-            if(!thisVersion.getIsCurrent()){
-                return thisVersion;
-            }
-        }
-        return null;
+    public String getActual(){
+        return this.actual;
     }
 }
