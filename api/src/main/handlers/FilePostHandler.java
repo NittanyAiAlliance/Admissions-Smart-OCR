@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class FilePostHandler extends HandlerPrototype implements HttpHandler {
@@ -32,7 +33,7 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
             JSONObject reqArgObj = new JSONObject();
             reqArgObj.put("file", imgStr);
             ocrResponse = getOCRRequest(reqArgObj);
-        } catch (IOException ioEx){
+        } catch (Exception ioEx){
             ioEx.printStackTrace();
         }
         JSONObject ocrResponseObj = formatOCRResponse(ocrResponse);
@@ -79,36 +80,31 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
      * @return properly formatted JSON object
      */
     private JSONObject formatOCRResponse(String ocrStr){
-        JSONArray ocrArray = new JSONArray();
-        //Remove the first bracket from the string
-        ocrStr = ocrStr.substring(1);
-        List<String> ocrStrArray = new ArrayList<String>();
-        while(ocrStr.charAt(0) == '['){
-            //There is another list to parse
-            ocrStrArray.add(ocrStr.substring(1, ocrStr.indexOf("]") - 1));
-            //Remove this from the master OCR string ~ skip the ] and the comma after it
-            ocrStr = ocrStr.substring(ocrStr.indexOf("]") + 2);
-            //Make sure there is no spaces before the next parse round
-            ocrStr = ocrStr.trim();
-        }
-        String ceebCode = "";
-        for(int i = 0; i < ocrStrArray.size(); i++){
-            if(i == ocrStrArray.size() - 1){
-                //This is the CEEB code
-                ceebCode = ocrStrArray.get(i);
-            } else {
-                //Get the list content ~ that is  ~ between the character after the [ and before the ]
-                String thisList[] = ocrStrArray.get(i).split(",");
-                JSONObject thisListObj = new JSONObject();
-                //TODO: load the schema in from somewhere?
-                thisListObj.put("name", thisList[0].replace("'", ""));
-                thisListObj.put("grade", thisList[1].replace("'", ""));
-                thisListObj.put("credits", thisList[2].replace("'", ""));
-                //Append to the array of classes
-                ocrArray.put(thisListObj);
+        JSONObject ocrObj = new JSONObject(ocrStr);
+        JSONArray courseArray = new JSONArray();
+        Iterator<String> lineKeys = ocrObj.keys();
+        while(lineKeys.hasNext()){
+            String lineKey = lineKeys.next();
+            if(ocrObj.get(lineKey) instanceof JSONObject){
+                //This is a line key ~ can be cast into a json object
+                JSONObject thisLineObj = ocrObj.getJSONObject(lineKey);
+                if(thisLineObj.has("COURSE")){
+                    //This object has a course! Cool! That means we can do something with it.
+                    if(!thisLineObj.getString("COURSE").equals("Table:")) {
+                        JSONObject thisCourseObj = new JSONObject();
+                        thisCourseObj.put("name", thisLineObj.getString("COURSE"));
+                        if (thisLineObj.has("GRADE")) {
+                            thisCourseObj.put("grade", thisLineObj.getString("GRADE"));
+                        }
+                        if (thisLineObj.has("CREDIT")) {
+                            thisCourseObj.put("credits", thisLineObj.getString("CREDIT"));
+                        }
+                        courseArray.put(thisCourseObj);
+                    }
+                }
             }
         }
-        JSONObject ocrObj = new JSONObject();
+        JSONObject formattedResponseObj = new JSONObject();
         JSONObject studentObj = new JSONObject();
         JSONObject highSchoolObj = new JSONObject();
         studentObj.put("name", "");
@@ -117,14 +113,14 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
         studentObj.put("sat", "");
         highSchoolObj.put("name", "");
         highSchoolObj.put("address", "");
-        highSchoolObj.put("ceeb", ceebCode);
-        ocrObj.put("student", studentObj);
-        ocrObj.put("highSchool", highSchoolObj);
+        highSchoolObj.put("ceeb", "");
+        formattedResponseObj.put("student", studentObj);
+        formattedResponseObj.put("highSchool", highSchoolObj);
         JSONObject tempYearObject = new JSONObject();
         tempYearObject.put("name", "");
-        tempYearObject.put("classes", ocrArray);
-        ocrObj.put("classYears", new JSONArray().put(tempYearObject));
-        return ocrObj;
+        tempYearObject.put("classes", courseArray);
+        formattedResponseObj.put("classYears", new JSONArray().put(tempYearObject));
+        return formattedResponseObj;
     }
 
     @Override
