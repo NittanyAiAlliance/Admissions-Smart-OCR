@@ -31,16 +31,10 @@ def process_transcript():
 
     # show the results
     print('CSV OUTPUT FILE: ', output_file)
-    os.system("spacyparse.py output.csv")
-    os.system("clean.py result.csv")
-    
-    result = open("result.csv", "r")
-    result_str = ""
-    for line in result:
-        if line == "":
-            continue
-        else:
-            result_str += line + ","
+    os.system("python main2.py output.csv")
+    os.system("python course_codes_final.py output.json")
+    result = open("output.json", "r")
+    result_str = result.read()
     print(result_str)
     return result_str
 
