@@ -30,3 +30,5 @@ OCR scripts/.idea/misc.xml
 OCR scripts/.idea/encodings.xml
 api/src/main/managers/server_storage.properties
 OCR scripts/subject_code.xlsx
+OCR scripts/final.json
+OCR scripts/__pycache__/spacyparse.cpython-37.pyc
