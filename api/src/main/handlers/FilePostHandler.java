@@ -1,6 +1,7 @@
 package main.handlers;
 
 import com.sun.net.httpserver.HttpHandler;
+import main.managers.GenericCourseManager;
 import main.types.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -99,6 +100,10 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
                         if (thisLineObj.has("CREDIT")) {
                             thisCourseObj.put("credits", thisLineObj.getString("CREDIT"));
                         }
+                        if (thisLineObj.has("COURSE_NAME")){
+                            //Every line will have this, but it only matters if the course has a long name too
+                            thisCourseObj.put("generic_name", thisLineObj.getString("COURSE_NAME"));
+                        }
                         courseArray.put(thisCourseObj);
                     }
                 }
@@ -120,7 +125,14 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
         tempYearObject.put("name", "");
         tempYearObject.put("classes", courseArray);
         formattedResponseObj.put("classYears", new JSONArray().put(tempYearObject));
+        JSONObject courseOptions = formatCourseOptions();
+        formattedResponseObj.put("genericCourses", courseOptions);
         return formattedResponseObj;
+    }
+
+    private JSONObject formatCourseOptions(){
+        GenericCourseManager genericCourseManager = new GenericCourseManager();
+        return genericCourseManager.getAllGenericCourseOptions();
     }
 
     @Override
