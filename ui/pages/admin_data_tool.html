@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark mb-0">
+        <a class="navbar-brand">SMART OCR</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsed-navbar"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="collapsed-navbar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="../admin.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Performance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Data Tool</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <span class="navbar-text" id="username-disp">Joel Seidel</span>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <h1>Submissions Browser<hr/></h1>
+        </div>
+        <div class="row">
+            <table class="table" id="submissions-browser-table">
+                <thead>
+                    <th>Time</th>
+                    <th>Student Name</th>
+                    <th>High School</th>
+                    <th>CEEB Code</th>
+                    <th>Accurate</th>
+                    <th>Inaccurate</th>
+                    <th>Total Accuracy (%)</th>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="../js/utils.js"></script>
+    <script src="../js/grab.js"></script>
+    <script>
+        $(document).ready(function(){
+            getSubmissions(handleGetSubmissionsRequest);
+        });
+
+        let handleGetSubmissionsRequest = function(response){
+            let submissions = response.submissions;
+            let submissionTableBody = $('#submissions-browser-table').find("tbody");
+            for(let i = 0; i < submissions.length; i++){
+                let thisSub = submissions[i];
+                let thisSubDOM = $('<tr></tr>');
+                $('<td></td>').text(thisSub.timestamp).appendTo(thisSubDOM);
+                $('<td></td>').text(thisSub.firstname + " " + thisSub.lastname).appendTo(thisSubDOM);
+                $('<td></td>').text(thisSub.highschool).appendTo(thisSubDOM);
+                $('<td></td>').text(thisSub.ceeb).appendTo(thisSubDOM);
+                $('<td></td>').text(thisSub.validcount).appendTo(thisSubDOM);
+                $('<td></td>').text(thisSub.count - thisSub.validcount).appendTo(thisSubDOM);
+                $('<td></td>').text((thisSub.validcount / thisSub.count * 100).toFixed(2)).appendTo(thisSubDOM);
+                thisSubDOM.data("sub_id", thisSub.subId);
+                thisSubDOM.appendTo(submissionTableBody);
+            }
+        }
+    </script>
+</body>
