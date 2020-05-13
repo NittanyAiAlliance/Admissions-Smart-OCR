@@ -33,7 +33,7 @@ def process_transcript():
     print('CSV OUTPUT FILE: ', output_file)
     os.system("python main2.py output.csv")
     os.system("python course_codes_final.py output.json")
-    result = open("output.json", "r")
+    result = open("final.json", "r")
     result_str = result.read()
     print(result_str)
     return result_str
