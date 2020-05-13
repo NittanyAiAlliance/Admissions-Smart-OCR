@@ -60,28 +60,83 @@
                     </form>
                 </div>
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-9">
                 <div id="review-classes-container" class="container-fluid">
                     <div class="row">
                         <h4 class="w-100">Your Classes<hr/></h4>
                     </div>
-                    <div class="row">
-                        <div class="container-fluid" id="class-listing-container">
+                    <div class="container-fluid" id="all-class-container">
+                        <div class="row" id="class-listing-container">
                             <!-- Classes are appended here by script as they are created-->
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-outline-success ml-auto mr-2"><span class="material-icons">add</span></button>
+                        <button type="button" class="btn btn-outline-primary" id="submit-classes-button">Submit >>></button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="confirm-upload-modal">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm Submission</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h6>Are you are all classes are listed accurately?</h6>
+                    <button id="deny-submit-button" class="btn btn-outline-danger">No</button>
+                    <button id="confirm-submit-button" class="btn btn-outline-success">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="uploading-modal">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <span class="spinner-border text-dark" role="status"></span>
+                    </div>
+                    <h4 class="w-100 text-center mt-2">Uploading submission...</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/utils.js"></script>
+    <script src="js/posts.js"></script>
+    <script src="js/grab.js"></script>
     <script>
+        let classListContainer = $('#class-listing-container');
+        let submitButton = $('#submit-classes-button');
+        let expected_fields = [];
+        let classes_record_list = [];
+        let actual_fields = [];
+        let generic_courses = [];
         $(document).ready(function(){
-            let ocrJson = JSON.parse(sessionStorage.getItem("parseResult"));
+            let classes = JSON.parse(sessionStorage.getItem("parseResult"));
+            generic_courses = classes.genericCourses.subjects;
             //Set the personal information column DOM
+            prototypePersonalInfo();
             //parsePersonalInformation(ocrJson);
             //Create the year blocks in the class review DOM
-            parseSchoolYears(ocrJson);
+            parseSchoolYears(classes);
+            submitButton.click(handleSubmit);
+            $('#deny-submit-button').click(handleDenySubmit);
+            $('#confirm-submit-button').click(handleConfirmSubmit);
         });
+
+        let prototypePersonalInfo = function(){
+            $('#pi-name').val(sessionStorage.getItem("name"));
+            $('#pi-address').val(sessionStorage.getItem("address"));
+            $('#pi-gpa').val(sessionStorage.getItem("gpa"));
+            $('#pi-sat-score').val(sessionStorage.getItem("sat"));
+            $('#hs-name').val(sessionStorage.getItem("hs-name"));
+            $('#hs-address').val(sessionStorage.getItem("hs-address"));
+            $('#hs-phone').val(sessionStorage.getItem("hs-phone"));
+        };
 
         let parseSchoolYears = function(ocrJson){
             let years = ocrJson.classYears;
@@ -92,6 +147,7 @@
                 for(let i = 0; i < years.length; i++){
                     let thisYear = years[i];
                     addYearListing(thisYear, yearPrototype.clone());
+                    $(document).on('change', '.class-name', updateClass);
                 }
             });
         };
@@ -114,7 +170,8 @@
                     //Append the entire class (including the container) to the year object
                     thisClassListing.appendTo(classContainer);
                 }
-                yearDOM.appendTo($('#class-listing-container'));
+                yearDOM.appendTo(classListContainer);
+                actual_fields = new Array(expected_fields.length);
             });
         };
 
@@ -125,11 +182,47 @@
          * @return class DOM object to be appended to the year container
          */
         let createClassListing = function(thisClass, classDOM){
+            expected_fields.push({
+                name: thisClass.name,
+                grade: thisClass.grade,
+                credits: thisClass.credits
+            });
             classDOM.find('.class-name').val(thisClass.name);
             classDOM.find('.class-grade').val(thisClass.grade);
             classDOM.find('.class-credits').val(thisClass.credits);
             classDOM.find('.class-weight').val(thisClass.weight);
+            populateCourseOptions(classDOM, thisClass);
+            classDOM.data('index', classes_record_list.length);
+            classes_record_list.push(classDOM);
             return classDOM;
+        };
+
+        let populateCourseOptions = function(classDOM, thisClass){
+            let subjectSelect = classDOM.find('.info-display-generic-course-subject');
+            let courseSelect = classDOM.find('.info-display-generic-course-name');
+            //Iterate through each of the subjects
+            for(let i = 0; i < generic_courses.length; i++){
+                let thisSubject = generic_courses[i];
+                let thisSubjectOption = $('<option></option>');
+                thisSubjectOption.attr("value", thisSubject.code);
+                thisSubjectOption.text(thisSubject.name);
+                thisSubjectOption.appendTo(subjectSelect);
+                let thisSubjectCourses = thisSubject.courses;
+                for(let j = 0; j < thisSubjectCourses.length; j++){
+                    let thisCourse = thisSubjectCourses[j];
+                    let thisCourseOption = $('<option></option>');
+                    thisCourseOption.attr("value", thisCourse.code);
+                    thisCourseOption.text(thisCourse.name);
+                    if(thisCourse.name === thisClass.generic_name){
+                        courseSelect.find('option').prop("selected", false);
+                        thisCourseOption.prop("selected", true);
+                        courseSelect.prop("disabled", false);
+                        subjectSelect.find('.default-option').prop("selected", false);
+                        subjectSelect.find('option[value="' + thisSubject.code + '"').prop("selected", true);
+                    }
+                    thisCourseOption.appendTo(courseSelect);
+                }
+            }
         };
 
         /**
@@ -163,6 +256,70 @@
             $('#hs-address').val(highSchool.address);
             $('#hs-phone').val(highSchool.phone);
             $('#hs-ceeb').val(highSchool.ceeb);
+        };
+
+        let updateClass = function(e) {
+            let sender = $(e.target).parents().eq(4);
+            let senderIndex = sender.data('index');
+            actual_fields[senderIndex] = {
+                name: sender.find('.class-name').val(),
+                grade: sender.find('.class-grade').val(),
+                credits: sender.find('.class-credits').val()
+            };
+        };
+
+        /**
+         * Handle the clicking of the submit button
+         */
+        let handleSubmit = function(){
+            //Show the confirmation dialog
+            $('#confirm-upload-modal').modal();
+        };
+
+        /**
+         * Handle the click of the 'no i want to go back' button
+         */
+        let handleDenySubmit = function(){
+            //Make the confirmation dialog go away
+            $('#confirm-upload-modal').modal("hide");
+        };
+
+        /**
+         * Handle the submission process ~ clicking of the confirm submit button
+         */
+        let handleConfirmSubmit = function(){
+            $('#confirm-upload-modal').modal("hide");
+            $('#uploading-modal').modal();
+            //TODO: WORK AROUND ~ NOT IMPLEMENTED INTO WORK FLOW
+            let user = {
+                firstname: "SAMPLE",
+                lastname: "PERSON",
+                hs_name: "STATE COLLEGE HIGH SCHOOL",
+                ceeb_code: "000000"
+            };
+            let fields = [];
+            let file = sessionStorage.getItem("file");
+            for(let i = 0; i < actual_fields.length; i++){
+                fields.push({
+                    expected: expected_fields[i],
+                    actual: actual_fields[i] === undefined ? expected_fields[i] : actual_fields[i],
+                    isValid: actual_fields[i] === undefined
+                });
+            }
+            sendSubmissionPost(user, fields, file, handleSubmitComplete);
+        };
+
+        /**
+         * Handle the submission of the final class records to the data system
+         */
+        let handleSubmitComplete = function(parseReturn){
+            $('#uploading-modal').modal("hide");
+            //TODO: actual forms here to do whatever happens next in the workflow
+            if(parseReturn.success){
+                alert("Successfully submitted high school transcript");
+            } else {
+                alert("There was a problem uploading your transcript");
+            }
         };
     </script>
 </body>
