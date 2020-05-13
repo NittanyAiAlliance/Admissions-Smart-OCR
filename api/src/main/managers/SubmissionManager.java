@@ -3,6 +3,7 @@ package main.managers;
 import main.data.DatabaseInteraction;
 import main.types.Applicant;
 import main.types.Field;
+import main.types.Submission;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,11 +14,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static java.lang.Character.digit;
 
@@ -228,5 +227,43 @@ public class SubmissionManager {
         }
         this.storageSecurityKey = storageProperties.getProperty("security_key");
         return System.getProperty("user.home") + File.separator + storageProperties.getProperty("dir") + File.separator + submissionUID.replaceAll("[^a-zA-Z0-9]", "") + storageProperties.getProperty("file_type");
+    }
+
+    /**
+     * Get all submissions
+     * @return List of submission objects
+     */
+    public List<Submission> getSubmissions(){
+        List<Submission> submissions = new ArrayList<>();
+        String getSubmissionsSql = "SELECT SUBMISSION_ID, FIRST_NAME, LAST_NAME, HIGH_SCHOOL_NAME, CEEB_CODE, SUBMISSION_TIMESTAMP FROM SUBMISSIONS";
+        String getSubmissionFieldsSql = "SELECT IS_VALID, EXPECTED_VALUE, ACTUAL_VALUE FROM SUBMITTED_FIELDS WHERE SUBMISSION_ID = ?";
+        PreparedStatement getSubmissionsStmt = database.prepareStatement(getSubmissionsSql);
+        try {
+            //Get the submissions results ~ this will have them all, if there are any
+            ResultSet submissionsResults = database.query(getSubmissionsStmt);
+            while(submissionsResults.next()){
+                String submissionId = submissionsResults.getString("SUBMISSION_ID");
+                String firstname = submissionsResults.getString("FIRST_NAME");
+                String lastname = submissionsResults.getString("LAST_NAME");
+                String highSchoolName = submissionsResults.getString("HIGH_SCHOOL_NAME");
+                String ceeb = submissionsResults.getString("CEEB_CODE");
+                String timeStamp = submissionsResults.getTimestamp("SUBMISSION_TIMESTAMP").toString();
+                PreparedStatement getFieldValidityStmt = database.prepareStatement(getSubmissionFieldsSql);
+                getFieldValidityStmt.setString(1, submissionId);
+                ResultSet subValidityResults = database.query(getFieldValidityStmt);
+                List<Field> fields = new ArrayList<>();
+                while(subValidityResults.next()){
+                    boolean isValid = subValidityResults.getBoolean("IS_VALID");
+                    String expectedValue = subValidityResults.getString("EXPECTED_VALUE");
+                    String actualValue = subValidityResults.getString("ACTUAL_VALUE");
+                    Field thisField = new Field(expectedValue, actualValue, isValid);
+                    fields.add(thisField);
+                }
+                submissions.add(new Submission(submissionId, firstname, lastname, highSchoolName, ceeb, timeStamp, fields));
+            }
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
+        return submissions;
     }
 }
