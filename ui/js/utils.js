@@ -1,9 +1,12 @@
 //API URL ADDRESS
 const apiUrl = "http://3.15.215.137:2020";
+//const apiUrl = "http://localhost:2020";
 //API ENDPOINT MAP
 let apiNodeMap = {
     getToken : "/token/get",
-    postFile : "/file/post"
+    postFile : "/file/post",
+    postSubmission: "/submission/post",
+    getSubmissions: "/submission/get"
 };
 /**
  * Send an API request with no parameters
