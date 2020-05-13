@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import main.handlers.FilePostHandler;
+import main.handlers.GetSubmissionHandler;
 import main.handlers.SubmissionHandler;
 import main.handlers.TokenRequestHandler;
 
@@ -81,6 +82,7 @@ public class Server {
         server.createContext("/token/get", new TokenRequestHandler());
         server.createContext("/file/post", new FilePostHandler());
         server.createContext("/submission/post", new SubmissionHandler());
+        server.createContext("/submission/get", new GetSubmissionHandler());
         return server;
     }
 }
