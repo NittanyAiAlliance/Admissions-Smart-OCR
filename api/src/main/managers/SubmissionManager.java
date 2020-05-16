@@ -29,7 +29,7 @@ public class SubmissionManager {
     /**
      * Constructor to initialize database connection
      */
-    public SubmissionManager(){
+    public SubmissionManager() {
         database = new DatabaseInteraction();
     }
 
@@ -37,19 +37,20 @@ public class SubmissionManager {
 
     /**
      * Create the records to store a submissions ~ this includes fields and the file
-     * @param submittingUser applicant making the submissions
-     * @param file Base64 representation of the submitted file
+     *
+     * @param submittingUser  applicant making the submissions
+     * @param file            Base64 representation of the submitted file
      * @param submittedFields list of field objects submitted by the user
      * @return success boolean
      */
-    public boolean createNewSubmission(Applicant submittingUser, String file, List<Field> submittedFields){
+    public boolean createNewSubmission(Applicant submittingUser, String file, List<Field> submittedFields) {
         //Generate/collect properties of this submission
         String submissionUID = getSubmissionUUID();
         String fileRelPath = getStorageRelativeFilePath(submissionUID);
         String encryptedFile = encryptFile(file);
         createSubmissionRecord(submittingUser, submissionUID);
         //Store the transcript image/file
-        if(storeFile(submissionUID, encryptedFile, fileRelPath)){
+        if (storeFile(submissionUID, encryptedFile, fileRelPath)) {
             //Parse the fields and add to the field records
             createFieldRecords(submissionUID, submittedFields);
             return true;
@@ -61,10 +62,11 @@ public class SubmissionManager {
 
     /**
      * Create a record of the submission ~ that is the user making the submissions
+     *
      * @param submittingUser the applicant making the submission and their general information for localization
-     * @param submissionUID the unique identifier of the overall submission
+     * @param submissionUID  the unique identifier of the overall submission
      */
-    private void createSubmissionRecord(Applicant submittingUser, String submissionUID){
+    private void createSubmissionRecord(Applicant submittingUser, String submissionUID) {
         String createSubmissionSql = "INSERT INTO SUBMISSIONS (SUBMISSION_ID, FIRST_NAME, LAST_NAME, HIGH_SCHOOL_NAME, CEEB_CODE) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement createSubmissionStmt = database.prepareStatement(createSubmissionSql);
         try {
@@ -75,33 +77,35 @@ public class SubmissionManager {
             createSubmissionStmt.setString(4, submittingUser.getHighSchoolName());
             createSubmissionStmt.setString(5, submittingUser.getCeebCode());
             database.nonQuery(createSubmissionStmt);
-        } catch (SQLException sqlEx){
+        } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
     }
 
     /**
      * Store the transcript image/file
+     *
      * @param submissionUID unique identifier of the submission ~ that is ~ what it is referred to in data
      * @param encryptedFile Base64 representation of the transcript file encypted with server storage security key
-     * @param filePath constructed file path of this file ~ that is ~ where is the data being written to
+     * @param filePath      constructed file path of this file ~ that is ~ where is the data being written to
      * @return were all of the storage task components successful?
      */
-    private boolean storeFile(String submissionUID, String encryptedFile, String filePath){
+    private boolean storeFile(String submissionUID, String encryptedFile, String filePath) {
         //Write the transcript file to the file system, then link the relative path to its data UID
         return writeEncryptedFileToFileSystem(encryptedFile, filePath) && setFileSystemPointerToData(submissionUID, filePath);
     }
 
     /**
      * Write the encrypted file string to the server file system at the specified path
+     *
      * @param encryptedFile encrypted string of the transcript image/file
-     * @param filePath constructed file path pointing to the server file system
+     * @param filePath      constructed file path pointing to the server file system
      * @return was this task successful?
      */
-    private boolean writeEncryptedFileToFileSystem(String encryptedFile, String filePath){
+    private boolean writeEncryptedFileToFileSystem(String encryptedFile, String filePath) {
         try {
             File transcriptFile = new File(filePath);
-            if(!transcriptFile.createNewFile()){
+            if (!transcriptFile.createNewFile()) {
                 //This means file collision, which (theoretically) cannot occur given the way files are named
                 throw new IOException();
             }
@@ -117,11 +121,12 @@ public class SubmissionManager {
 
     /**
      * Link the submission UID to the relative file path in the database
+     *
      * @param submissionUID unique id of the submission ~ this is how it is referred in data
-     * @param filePath the pointer to the server file system
+     * @param filePath      the pointer to the server file system
      * @return was this task successful?
      */
-    private boolean setFileSystemPointerToData(String submissionUID, String filePath){
+    private boolean setFileSystemPointerToData(String submissionUID, String filePath) {
         //Create insert pointer statement
         String insertFileSql = "INSERT INTO TRANSCRIPT_IMG (UUID, REL_PATH) VALUES (?, ?)";
         PreparedStatement insertFileStmt = database.prepareStatement(insertFileSql);
@@ -131,7 +136,7 @@ public class SubmissionManager {
             insertFileStmt.setString(2, filePath);
             database.nonQuery(insertFileStmt);
             return true;
-        } catch(SQLException sqlEx) {
+        } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
             return false;
         }
@@ -139,17 +144,18 @@ public class SubmissionManager {
 
     /**
      * Encrypt the transcript file with the storage security key
+     *
      * @param fileStr Base64 representation of the file
      * @return encrypted base64 representation of the file
      */
-    private String encryptFile(String fileStr){
+    private String encryptFile(String fileStr) {
         String encryptedFileStr = "";
         try {
             //Convert the security key to hexadecimal to make into AES key
-            int length = storageSecurityKey.substring(0,32).length();
+            int length = storageSecurityKey.substring(0, 32).length();
             byte[] securityKeyBytes = new byte[length / 2];
             for (int i = 0; i < length; i += 2) {
-                securityKeyBytes[i / 2] = (byte) ((digit(storageSecurityKey.charAt(i), 16) << 4) | digit(storageSecurityKey.charAt(i+1), 16));
+                securityKeyBytes[i / 2] = (byte) ((digit(storageSecurityKey.charAt(i), 16) << 4) | digit(storageSecurityKey.charAt(i + 1), 16));
             }
             //Create the encryption key
             Key encryptKey = new SecretKeySpec(securityKeyBytes, "AES");
@@ -159,7 +165,7 @@ public class SubmissionManager {
             //Do encryption
             byte[] encryptedFileByteArr = encryptFileCipher.doFinal(fileStr.getBytes());
             encryptedFileStr = new String(encryptedFileByteArr);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return encryptedFileStr;
@@ -167,10 +173,11 @@ public class SubmissionManager {
 
     /**
      * Create and insert records for the parsed fields from the transcript submission
+     *
      * @param submissionUID unique ID of the transcript ~ the PK from data
-     * @param fields field objects representing fields pulled from the transcript
+     * @param fields        field objects representing fields pulled from the transcript
      */
-    private void createFieldRecords(String submissionUID, List<Field> fields){
+    private void createFieldRecords(String submissionUID, List<Field> fields) {
         String insertFieldSql = "INSERT INTO SUBMITTED_FIELDS (SUBMISSION_ID, IS_VALID, EXPECTED_VALUE, ACTUAL_VALUE) VALUES (?, ?, ?, ?)";
         PreparedStatement insertFieldStmt = database.prepareStatement(insertFieldSql);
         //Create statement for each of the fields to batch insert
@@ -189,7 +196,7 @@ public class SubmissionManager {
         //Execute the batch insert of all fields
         try {
             insertFieldStmt.executeBatch();
-        } catch(SQLException sqlEx) {
+        } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
     }
@@ -197,9 +204,10 @@ public class SubmissionManager {
     /**
      * Generate a unique identifier for this transaction.
      * This is an arbitrary value that doesn't really matter, but hides the row id implementation
+     *
      * @return a UID for this submission
      */
-    private String getSubmissionUUID(){
+    private String getSubmissionUUID() {
         String hashToken = "";
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -207,7 +215,7 @@ public class SubmissionManager {
             String currentTime = Long.toString(Calendar.getInstance().getTimeInMillis());
             byte[] hash = digest.digest(currentTime.getBytes(StandardCharsets.UTF_8));
             hashToken = Base64.getEncoder().encodeToString(hash);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return hashToken;
@@ -215,10 +223,11 @@ public class SubmissionManager {
 
     /**
      * Construct the storage path for an transcript data file
+     *
      * @param submissionUID unique identifier for this transcript
      * @return storage location path string for the submitted file
      */
-    private String getStorageRelativeFilePath(String submissionUID){
+    private String getStorageRelativeFilePath(String submissionUID) {
         Properties storageProperties = new Properties();
         try {
             storageProperties.load(getClass().getResourceAsStream("server_storage.properties"));
@@ -231,39 +240,110 @@ public class SubmissionManager {
 
     /**
      * Get all submissions
+     *
      * @return List of submission objects
      */
-    public List<Submission> getSubmissions(){
+    public List<Submission> getSubmissions() {
         List<Submission> submissions = new ArrayList<>();
-        String getSubmissionsSql = "SELECT SUBMISSION_ID, FIRST_NAME, LAST_NAME, HIGH_SCHOOL_NAME, CEEB_CODE, SUBMISSION_TIMESTAMP FROM SUBMISSIONS";
-        String getSubmissionFieldsSql = "SELECT IS_VALID, EXPECTED_VALUE, ACTUAL_VALUE FROM SUBMITTED_FIELDS WHERE SUBMISSION_ID = ?";
+        String getSubmissionsSql = "SELECT SUBMISSIONS.SUBMISSION_ID, FIRST_NAME, LAST_NAME, HIGH_SCHOOL_NAME, CEEB_CODE, SUBMISSION_TIMESTAMP, IS_VALID, EXPECTED_VALUE, ACTUAL_VALUE FROM SUBMISSIONS INNER JOIN SUBMITTED_FIELDS ON SUBMISSIONS.SUBMISSION_ID = SUBMITTED_FIELDS.SUBMISSION_ID";
         PreparedStatement getSubmissionsStmt = database.prepareStatement(getSubmissionsSql);
         try {
             //Get the submissions results ~ this will have them all, if there are any
             ResultSet submissionsResults = database.query(getSubmissionsStmt);
-            while(submissionsResults.next()){
-                String submissionId = submissionsResults.getString("SUBMISSION_ID");
-                String firstname = submissionsResults.getString("FIRST_NAME");
-                String lastname = submissionsResults.getString("LAST_NAME");
-                String highSchoolName = submissionsResults.getString("HIGH_SCHOOL_NAME");
-                String ceeb = submissionsResults.getString("CEEB_CODE");
-                String timeStamp = submissionsResults.getTimestamp("SUBMISSION_TIMESTAMP").toString();
-                PreparedStatement getFieldValidityStmt = database.prepareStatement(getSubmissionFieldsSql);
-                getFieldValidityStmt.setString(1, submissionId);
-                ResultSet subValidityResults = database.query(getFieldValidityStmt);
-                List<Field> fields = new ArrayList<>();
-                while(subValidityResults.next()){
-                    boolean isValid = subValidityResults.getBoolean("IS_VALID");
-                    String expectedValue = subValidityResults.getString("EXPECTED_VALUE");
-                    String actualValue = subValidityResults.getString("ACTUAL_VALUE");
-                    Field thisField = new Field(expectedValue, actualValue, isValid);
-                    fields.add(thisField);
-                }
-                submissions.add(new Submission(submissionId, firstname, lastname, highSchoolName, ceeb, timeStamp, fields));
-            }
+            submissions = parseSubmissionRecords(submissionsResults);
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
         return submissions;
+    }
+
+    /**
+     * Overload to return a single submission object
+     *
+     * @param id id of the submission
+     * @return submission object for the given ID
+     */
+    public Submission getSubmissions(String id) {
+        String getSubmissionsSql = "SELECT SUBMISSIONS.SUBMISSION_ID, FIRST_NAME, LAST_NAME, HIGH_SCHOOL_NAME, CEEB_CODE, SUBMISSION_TIMESTAMP, IS_VALID, EXPECTED_VALUE, ACTUAL_VALUE FROM SUBMISSIONS INNER JOIN SUBMITTED_FIELDS ON SUBMISSIONS.SUBMISSION_ID = SUBMITTED_FIELDS.SUBMISSION_ID WHERE SUBMISSIONS.SUBMISSION_ID = ?";
+        PreparedStatement getSubmissionsStmt = database.prepareStatement(getSubmissionsSql);
+        try {
+            getSubmissionsStmt.setString(1, id);
+            //Get the submissions results ~ this will have them all, if there are any
+            ResultSet submissionsResults = database.query(getSubmissionsStmt);
+            //Parse the submission which will be in the 0th element of the submission records array
+            return parseSubmissionRecords(submissionsResults).get(0);
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Read the submission records from a result set and create a corresponding list of submission objects
+     * @param subResults result set from the submission query
+     * @return List of submission objects parsed from the result set
+     */
+    private List<Submission> parseSubmissionRecords(ResultSet subResults) throws SQLException {
+        List<Submission> submissions = new ArrayList<>();
+        String currentSubmissionId = "";
+        Submission thisSubmission = null;
+        while(subResults.next()){
+            String thisSubmissionId = subResults.getString("SUBMISSION_ID");
+            if(thisSubmissionId.equals(currentSubmissionId)) {
+                //This another field within the current submission
+                thisSubmission.addField(parseFieldFromRecord(subResults));
+            } else {
+                //This is a new submission entirely
+                if(thisSubmission != null){
+                    //This submission is real, it should be added to the submission list
+                    submissions.add(thisSubmission);
+                }
+                //Set the new submission id
+                currentSubmissionId = thisSubmissionId;
+                //Get the submission object from this field
+                thisSubmission = parseSubmissionFromRecord(subResults);
+                //Add the first field of this submission from this record
+                thisSubmission.addField(parseFieldFromRecord(subResults));
+            }
+        }
+        //If there are submissions in this query, the current one must be added here outside the loop
+        if(thisSubmission != null){
+            //There is a submission, add it to the submissions array
+            submissions.add(thisSubmission);
+        }
+        return submissions;
+    }
+
+    /**
+     * Parse a single submission from a record within a result set. This creates a submission object to describe the next n number of fields
+     * @param subResults result set pointed at the desired submission
+     * @return submission object representation of the submission in the result set
+     * @throws SQLException thrown if there is an issue with pulling the properties from the ResultSet
+     */
+    private Submission parseSubmissionFromRecord(ResultSet subResults) throws SQLException {
+        //Get the submission properties from the result set
+        String submissionId = subResults.getString("SUBMISSION_ID");
+        String firstName = subResults.getString("FIRST_NAME");
+        String lastName = subResults.getString("LAST_NAME");
+        String highSchoolName = subResults.getString("HIGH_SCHOOL_NAME");
+        String ceebCode = subResults.getString("CEEB_CODE");
+        String timeStamp = subResults.getString("SUBMISSION_TIMESTAMP");
+        //Instantiate new submission object and return result
+        return new Submission(submissionId, firstName, lastName, highSchoolName, ceebCode, timeStamp);
+    }
+
+    /**
+     * Get the field object from the pointed record in the result set ~ this ignores the submission
+     * @param subResults Result set pointed at the record to parse
+     * @return Field object representation of the record field
+     * @throws SQLException thrown if there is an issue with pulling the fields from the ResultSet
+     */
+    private Field parseFieldFromRecord(ResultSet subResults) throws SQLException {
+        //Get the field properties from the result set
+        boolean isValid = subResults.getBoolean("IS_VALID");
+        String expectedValue = subResults.getString("EXPECTED_VALUE");
+        String actualValue = subResults.getString("ACTUAL_VALUE");
+        //Instantiate and return a field object representation of this record
+        return new Field(expectedValue, actualValue, isValid);
     }
 }
