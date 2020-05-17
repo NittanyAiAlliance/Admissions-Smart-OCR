@@ -7,6 +7,7 @@ import main.managers.LogManager;
 import main.managers.OcrApiManager;
 import main.types.ErrorLog;
 import main.types.ExternalOrganization;
+import main.types.GenericSubjectArea;
 import main.types.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,6 +19,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Handler for posting a file action
@@ -94,8 +96,8 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
 
     /**
      * Get the course data from the OCR response
-     * @param ocrObj
-     * @return
+     * @param ocrObj parse the courses from the OCR response string
+     * @return json array of the courses within the ocr response string
      */
     private JSONArray parseCourses(JSONObject ocrObj){
         JSONArray courseArray = new JSONArray();
@@ -135,7 +137,8 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
      */
     private JSONObject formatCourseOptions(){
         GenericCourseManager genericCourseManager = new GenericCourseManager();
-        return genericCourseManager.getAllGenericCourseOptions();
+        List<GenericSubjectArea> genericSubjectAreas = genericCourseManager.getAllGenericCourseOptions();
+        return genericCourseManager.convertCourseOptionsToJson(genericSubjectAreas);
     }
 
     @Override
