@@ -165,3 +165,7 @@ body {
 .major-chart {
     height: 350px;
 }
+
+.invalid-field-row {
+    background-color: rgba(255, 0, 0, 0.2);
+}
