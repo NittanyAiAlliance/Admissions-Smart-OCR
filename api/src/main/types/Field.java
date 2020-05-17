@@ -22,7 +22,7 @@ public class Field {
      * Getter for validity of this field ~ that is ~ did the actual field value match the expected
      * @return does the actual field value match expected field value?
      */
-    public boolean getValuesMatch(){
+    public boolean getIsValid(){
         return isValid;
     }
 
