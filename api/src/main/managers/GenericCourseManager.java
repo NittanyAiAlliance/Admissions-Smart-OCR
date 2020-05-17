@@ -19,7 +19,7 @@ public class GenericCourseManager {
         this.database = new DatabaseInteraction();
     }
 
-    public JSONObject getAllGenericCourseOptions(){
+    public List<GenericSubjectArea> getAllGenericCourseOptions(){
         List<GenericSubjectArea> genericSubjectAreas = new ArrayList<>();
         String getSubjectsSql = "SELECT * FROM SUBJECT_AREAS";
         PreparedStatement getSubjectsStmt = database.prepareStatement(getSubjectsSql);
@@ -48,19 +48,17 @@ public class GenericCourseManager {
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
-        JSONObject courseOptions = convertCourseOptionsToJson(genericSubjectAreas);
-        return courseOptions;
+        return genericSubjectAreas;
     }
 
-    private JSONObject convertCourseOptionsToJson(List<GenericSubjectArea> subjectAreas){
+    public JSONObject convertCourseOptionsToJson(List<GenericSubjectArea> subjectAreas){
         JSONArray subjectAreaArray = new JSONArray();
-        for(int i = 0; i < subjectAreas.size(); i++){
-            GenericSubjectArea thisSubject = subjectAreas.get(i);
+        for (GenericSubjectArea thisSubject : subjectAreas) {
             JSONObject thisSubjectObj = new JSONObject();
             thisSubjectObj.put("code", thisSubject.getCode());
             thisSubjectObj.put("name", thisSubject.getName());
             JSONArray coursesArray = new JSONArray();
-            for(int j = 0; j < thisSubject.getCourses().size(); j++){
+            for (int j = 0; j < thisSubject.getCourses().size(); j++) {
                 GenericCourse thisCourse = thisSubject.getCourses().get(j);
                 JSONObject thisCourseObj = new JSONObject();
                 thisCourseObj.put("code", thisCourse.getCode());
