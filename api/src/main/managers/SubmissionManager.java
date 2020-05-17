@@ -185,7 +185,7 @@ public class SubmissionManager {
             try {
                 //Create record for this field
                 insertFieldStmt.setString(1, submissionUID);
-                insertFieldStmt.setBoolean(2, thisField.getValuesMatch());
+                insertFieldStmt.setBoolean(2, thisField.getIsValid());
                 insertFieldStmt.setString(3, thisField.getExpected());
                 insertFieldStmt.setString(4, thisField.getActual());
                 insertFieldStmt.addBatch();
@@ -345,5 +345,24 @@ public class SubmissionManager {
         String actualValue = subResults.getString("ACTUAL_VALUE");
         //Instantiate and return a field object representation of this record
         return new Field(expectedValue, actualValue, isValid);
+    }
+
+    /**
+     * Get the count of valid fields within a submission
+     * @param thisSubmission the submission to determine the valid number of fields for
+     * @return count of the valid fields within the submission object
+     */
+    public static int getValidFieldCount(Submission thisSubmission) {
+        //Count the valid fields in the list of all fields
+        int validCounter = 0;
+        for (int j = 0; j < thisSubmission.getFields().size(); j++) {
+            Field thisField = thisSubmission.getFields().get(j);
+            //Is this field valid?
+            if (thisField.getIsValid()) {
+                //Yup, count it
+                validCounter++;
+            }
+        }
+        return validCounter;
     }
 }
