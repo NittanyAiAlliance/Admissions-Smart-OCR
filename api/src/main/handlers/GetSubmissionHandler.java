@@ -31,24 +31,12 @@ public class GetSubmissionHandler extends HandlerPrototype implements HttpHandle
     private JSONArray formatSubmissions(List<Submission> submissions){
         JSONArray submissionsArr = new JSONArray();
         for (Submission thisSubmission : submissions) {
-            JSONObject subObj = new JSONObject();
-            subObj.put("subId", thisSubmission.getUid());
-            subObj.put("firstname", thisSubmission.getFirstname());
-            subObj.put("lastname", thisSubmission.getLastname());
-            subObj.put("highschool", thisSubmission.getHighschool());
-            subObj.put("ceeb", thisSubmission.getCeeb());
-            subObj.put("timestamp", thisSubmission.getTimeStamp());
-            int validCounter = 0;
-            int totalCounter = 0;
-            for (int j = 0; j < thisSubmission.getFields().size(); j++) {
-                Field thisField = thisSubmission.getFields().get(j);
-                if (thisField.getValuesMatch()) {
-                    validCounter++;
-                }
-                totalCounter++;
-            }
-            subObj.put("count", totalCounter);
-            subObj.put("validcount", validCounter);
+            //Get the JSON object representation of the object
+            JSONObject subObj = thisSubmission.convertToJson();
+            //Add additional fields validity data properties
+            int validFieldCount = SubmissionManager.getValidFieldCount(thisSubmission);
+            subObj.put("count", thisSubmission.getFields().size());
+            subObj.put("validcount", validFieldCount);
             submissionsArr.put(subObj);
         }
         return submissionsArr;
