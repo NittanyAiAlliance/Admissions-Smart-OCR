@@ -1,10 +1,16 @@
 package main.handlers;
 
 import com.sun.net.httpserver.HttpHandler;
+import main.managers.ExternalOrganizationManager;
+import main.managers.GenericCourseManager;
+import main.managers.LogManager;
+import main.managers.OcrApiManager;
+import main.types.ErrorLog;
+import main.types.ExternalOrganization;
+import main.types.GenericSubjectArea;
 import main.types.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import sun.misc.BASE64Decoder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,66 +18,43 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Handler for posting a file action
+ * @author Joel Seidel
+ */
 public class FilePostHandler extends HandlerPrototype implements HttpHandler {
+    /**
+     * Required constructor (HandlerProtoype)
+     */
     public FilePostHandler(){
         super.handlerName = "File Post Handler";
         super.requiredKeys = new String[] { "file", "token" };
     }
 
-    private final String internalUrl = "http://localhost:5000";
-
+    /**
+     * Fulfill file post request
+     * @param requestParams parameters associated with the request
+     */
     @Override
     public void fulfillRequest(JSONObject requestParams) {
         //Get image file string from request parameters
         String imgStr = requestParams.getString("file").split(",")[1];
         //Create OCR API request
         String ocrResponse = "";
-        try{
-            JSONObject reqArgObj = new JSONObject();
-            reqArgObj.put("file", imgStr);
-            ocrResponse = getOCRRequest(reqArgObj);
+        OcrApiManager ocrApiManager = new OcrApiManager();
+        try {
+            //Perform the request to the OCR API
+            ocrResponse = ocrApiManager.doOcr(imgStr);
         } catch (IOException ioEx){
             ioEx.printStackTrace();
         }
+        //Convert the OCR API response string to a JSON object
         JSONObject ocrResponseObj = formatOCRResponse(ocrResponse);
+        //Everything looks good ~ send it back
         returnActionSuccess(ocrResponseObj);
-    }
-
-    /**
-     * Request OCR services from the backend API and get the results
-     * @param reqArgObj JSONObject containing the image and string to be OCR'd
-     * @return string containing the tagged fields from the OCR
-     * @throws IOException something went wrong with the internal request
-     */
-    private String getOCRRequest(JSONObject reqArgObj) throws IOException{
-        //Create connection to local OCR api
-        HttpURLConnection httpClient = (HttpURLConnection) new URL(internalUrl).openConnection();
-        httpClient.setRequestMethod("POST");
-        httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
-        httpClient.setDoOutput(true);
-        //Write the request arguments
-        try(OutputStream os = httpClient.getOutputStream()){
-            os.write(reqArgObj.toString().getBytes());
-            os.flush();
-            os.close();
-        }
-        int responseCode = httpClient.getResponseCode();
-        if(responseCode != 200){
-            //Something went wrong
-            System.out.println("Could not connect to internal API");
-        }
-        //Read request response ~ expecting OCR string
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(httpClient.getInputStream()))){
-            StringBuilder response = new StringBuilder();
-            String line;
-            while((line = in.readLine()) != null){
-                response.append(line);
-            }
-            return response.toString();
-        }
     }
 
     /**
@@ -80,52 +63,82 @@ public class FilePostHandler extends HandlerPrototype implements HttpHandler {
      * @return properly formatted JSON object
      */
     private JSONObject formatOCRResponse(String ocrStr){
-        JSONArray ocrArray = new JSONArray();
-        //Remove the first bracket from the string
-        ocrStr = ocrStr.substring(1);
-        List<String> ocrStrArray = new ArrayList<String>();
-        while(ocrStr.charAt(0) == '['){
-            //There is another list to parse
-            ocrStrArray.add(ocrStr.substring(1, ocrStr.indexOf("]") - 1));
-            //Remove this from the master OCR string ~ skip the ] and the comma after it
-            ocrStr = ocrStr.substring(ocrStr.indexOf("]") + 2);
-            //Make sure there is no spaces before the next parse round
-            ocrStr = ocrStr.trim();
-        }
-        String ceebCode = "";
-        for(int i = 0; i < ocrStrArray.size(); i++){
-            if(i == ocrStrArray.size() - 1){
-                //This is the CEEB code
-                ceebCode = ocrStrArray.get(i);
-            } else {
-                //Get the list content ~ that is  ~ between the character after the [ and before the ]
-                String thisList[] = ocrStrArray.get(i).split(",");
-                JSONObject thisListObj = new JSONObject();
-                //TODO: load the schema in from somewhere?
-                thisListObj.put("name", thisList[0].replace("'", ""));
-                thisListObj.put("grade", thisList[1].replace("'", ""));
-                thisListObj.put("credits", thisList[2].replace("'", ""));
-                //Append to the array of classes
-                ocrArray.put(thisListObj);
-            }
-        }
-        JSONObject ocrObj = new JSONObject();
-        JSONObject studentObj = new JSONObject();
-        JSONObject highSchoolObj = new JSONObject();
-        studentObj.put("name", "");
-        studentObj.put("address", "");
-        studentObj.put("gpa", "");
-        studentObj.put("sat", "");
-        highSchoolObj.put("name", "");
-        highSchoolObj.put("address", "");
-        highSchoolObj.put("ceeb", ceebCode);
-        ocrObj.put("student", studentObj);
-        ocrObj.put("highSchool", highSchoolObj);
+        JSONObject ocrObj = new JSONObject(ocrStr);
+        JSONArray courseArray = parseCourses(ocrObj);
+        JSONObject formattedResponseObj = new JSONObject();
+        JSONObject highSchoolObj = parseHighSchool(ocrObj);
+        formattedResponseObj.put("highSchool", highSchoolObj);
         JSONObject tempYearObject = new JSONObject();
         tempYearObject.put("name", "");
-        tempYearObject.put("classes", ocrArray);
-        ocrObj.put("classYears", new JSONArray().put(tempYearObject));
-        return ocrObj;
+        tempYearObject.put("classes", courseArray);
+        formattedResponseObj.put("classYears", new JSONArray().put(tempYearObject));
+        JSONObject courseOptions = formatCourseOptions();
+        formattedResponseObj.put("genericCourses", courseOptions);
+        return formattedResponseObj;
+    }
+
+    /**
+     * Get high school data from CEEB code ~ perform look up
+     * @param ocrObj string response from the ocr api
+     * @return properly formatted high school sub-object
+     */
+    private JSONObject parseHighSchool(JSONObject ocrObj){
+        //Did they find a CEEB code here?
+        if(ocrObj.has("CEEB")){
+            //There is a CEEB code ~ we can perform a lookup
+            ExternalOrganizationManager externalOrganizationManager = new ExternalOrganizationManager();
+            ExternalOrganization thisHighSchool = externalOrganizationManager.getByCeeb(ocrObj.getInt("CEEB"));
+            return thisHighSchool.convertToJson();
+        } else {
+            return new JSONObject();
+        }
+    }
+
+    /**
+     * Get the course data from the OCR response
+     * @param ocrObj parse the courses from the OCR response string
+     * @return json array of the courses within the ocr response string
+     */
+    private JSONArray parseCourses(JSONObject ocrObj){
+        JSONArray courseArray = new JSONArray();
+        Iterator<String> lineKeys = ocrObj.keys();
+        while(lineKeys.hasNext()){
+            String lineKey = lineKeys.next();
+            if(ocrObj.get(lineKey) instanceof JSONObject){
+                //This is a line key ~ can be cast into a json object
+                JSONObject thisLineObj = ocrObj.getJSONObject(lineKey);
+                if(thisLineObj.has("COURSE")){
+                    //This object has a course! Cool! That means we can do something with it.
+                    if(!thisLineObj.getString("COURSE").equals("Table:")) {
+                        JSONObject thisCourseObj = new JSONObject();
+                        thisCourseObj.put("name", thisLineObj.getString("COURSE"));
+                        if (thisLineObj.has("GRADE")) {
+                            thisCourseObj.put("grade", thisLineObj.getString("GRADE"));
+                        }
+                        if (thisLineObj.has("CREDIT")) {
+                            thisCourseObj.put("credits", thisLineObj.getString("CREDIT"));
+                        }
+                        if (thisLineObj.has("COURSE_NAME")){
+                            //Every line will have this, but it only matters if the course has a long name too
+                            thisCourseObj.put("generic_name", thisLineObj.getString("COURSE_NAME"));
+                        }
+                        courseArray.put(thisCourseObj);
+                    }
+                }
+            }
+        }
+        return courseArray;
+    }
+
+    /**
+     * Get the generic course options from the database
+     * These will match up with the tagged courses
+     * @return JSON object containing the course options
+     */
+    private JSONObject formatCourseOptions(){
+        GenericCourseManager genericCourseManager = new GenericCourseManager();
+        List<GenericSubjectArea> genericSubjectAreas = genericCourseManager.getAllGenericCourseOptions();
+        return genericCourseManager.convertCourseOptionsToJson(genericSubjectAreas);
     }
 
     @Override

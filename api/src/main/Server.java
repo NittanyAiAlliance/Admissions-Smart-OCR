@@ -4,8 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
-import main.handlers.FilePostHandler;
-import main.handlers.TokenRequestHandler;
+import main.handlers.*;
 
 import javax.net.ssl.*;
 import java.io.InputStream;
@@ -79,6 +78,8 @@ public class Server {
     private static HttpServer createHandlerContexts(HttpServer server){
         server.createContext("/token/get", new TokenRequestHandler());
         server.createContext("/file/post", new FilePostHandler());
+        server.createContext("/submission/post", new SubmissionHandler());
+        server.createContext("/submission/get", new GetSubmissionHandler());
         return server;
     }
 }

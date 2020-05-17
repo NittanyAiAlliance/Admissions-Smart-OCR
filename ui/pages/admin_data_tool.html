@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark mb-0">
+        <a class="navbar-brand">SMART OCR</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsed-navbar"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="collapsed-navbar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="../admin.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Performance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Data Tool</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <span class="navbar-text" id="username-disp">Joel Seidel</span>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <h1>Submissions Browser<hr/></h1>
+        </div>
+        <div class="row">
+            <table class="table" id="submissions-browser-table">
+                <thead>
+                    <th>Time</th>
+                    <th>Student Name</th>
+                    <th>High School</th>
+                    <th>CEEB Code</th>
+                    <th>Accurate</th>
+                    <th>Inaccurate</th>
+                    <th>Total Accuracy (%)</th>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal" id="view-sub-modal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="view-sub-title">Viewing Submission</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <h3 id="view-submission-name">SAMPLE JONES</h3>
+                        <h4 id="view-submission-highschool">STATE COLLEGE HIGH SCHOOL</h4>
+                        <p id="view-submission-accuracy">35/35 - 100% Accuracy</p>
+                    </div>
+                    <table class="table" id="view-submission-fields-table">
+                        <thead>
+                            <th>Field No.</th>
+                            <th>Valid?</th>
+                            <th>Content</th>
+                            <th>Errors</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/utils.js"></script>
+    <script src="../js/grab.js"></script>
+    <script>
+        let submissionObjs = [];
+
+        /**
+         * On load event for page ~ handle getting the submissions from the API
+         */
+        $(document).ready(function(){
+            getSubmissions(handleGetSubmissionsRequest);
+        });
+
+        /**
+         * Handle the completion of the get submissions request'
+         * @param response response from the API on getting the submissions
+         */
+        let handleGetSubmissionsRequest = function(response){
+            //Get submission array from the API response object
+            let submissions = response.submissions;
+            let submissionTableBody = $('#submissions-browser-table').find("tbody");
+            for(let i = 0; i < submissions.length; i++){
+                let thisSub = submissions[i];
+                let thisSubDOM = createSubmissionListingDOM(thisSub);
+                thisSubDOM.appendTo(submissionTableBody);
+                submissionObjs.push(thisSub);
+            }
+        }
+
+        /**
+         * Create a DOM element for the specified submission
+         * @param submission the submission to make the element listing for
+         */
+        let createSubmissionListingDOM = function(submission){
+            let thisSubDOM = $('<tr></tr>');
+            $('<td></td>').text(submission.timestamp).appendTo(thisSubDOM);
+            $('<td></td>').text(submission.firstname + " " + submission.lastname).appendTo(thisSubDOM);
+            $('<td></td>').text(submission.highschool).appendTo(thisSubDOM);
+            $('<td></td>').text(submission.ceeb).appendTo(thisSubDOM);
+            $('<td></td>').text(submission.validcount).appendTo(thisSubDOM);
+            $('<td></td>').text(submission.count - submission.validcount).appendTo(thisSubDOM);
+            $('<td></td>').text((submission.validcount / submission.count * 100).toFixed(2) + "%").appendTo(thisSubDOM);
+            thisSubDOM.data("sub_id", submission.subId);
+            thisSubDOM.click(handleSubmissionClick);
+            return thisSubDOM;
+        }
+
+        /**
+         * Handle the click of a submission record
+         * @param e event arguments from the DOM
+         */
+        let handleSubmissionClick = function(e) {
+            let sender = $(e.target).closest("tr");
+            let subId = sender.data("sub_id");
+            //Find the submission within the submission array
+            for(let i = 0; i < submissionObjs.length; i++){
+                let thisSubmission = submissionObjs[i];
+                if(thisSubmission.subId === subId){
+                    //This is the submission
+                    displaySubmission(thisSubmission);
+                }
+            }
+        }
+
+        /**
+         * Display the specified submission when the user clicks on it
+         * @param submission submission object to display
+         */
+        let displaySubmission = function(submission) {
+            //Get submission details
+            $('#view-submission-name').text(submission.firstname + " " + submission.lastname);
+            $('#view-submission-highschool').text(submission.highschool);
+            let accuracyPercentage = submission.validcount / submission.count * 100;
+            $('#view-submission-accuracy').text(submission.validcount + "/" + submission.count + " - " + accuracyPercentage.toFixed(2) + "%");
+            let fieldTable = $('#view-submission-fields-table').find('tbody');
+            //Empty the table from the last view of submission ~ if there was one
+            fieldTable.empty();
+            //Create listings for each of the fields in this submission
+            for(let i = 0; i < submission.fields.length; i++){
+                //Create a DOM element for this field
+                let fieldDOM = createFieldListingDOM(submission.fields[i], i);
+                fieldDOM.appendTo(fieldTable);
+            }
+            //Display the submission modal
+            $('#view-sub-modal').modal();
+        }
+
+        /**
+         * Create a listing DOM object for the specified field
+         * @param field specified field for the listing
+         * @param fieldIndex index of the field ~ necessary for the field ID field on the DOM
+         * @returns {*|jQuery.fn.init|jQuery|HTMLElement} DOM object for this field object
+         */
+        let createFieldListingDOM = function(field, fieldIndex) {
+            let thisFieldDOM = $('<tr></tr>');
+            $('<td></td>').text("" + (fieldIndex + 1)).appendTo(thisFieldDOM);
+            $('<td></td>').text(field.isValid ? "Yes" : "No").appendTo(thisFieldDOM);
+            //Convert the JSON stored object into a JS object
+            let actual = JSON.parse(field.actual);
+            //Create the display string from the actual object
+            let actualDisp = "<strong>NAME: </strong>" + actual.name + "<br/><strong>GRADE: </strong> " + actual.grade + "<br/><strong>CREDITS: </strong>" + actual.credits;
+            //Convert the JSON stored object into a JS object
+            let expected = JSON.parse(field.expected);
+            //Create the display string from the expected object
+            let expectedDisp = "<strong>NAME:</strong>: " + expected.name + "<br/><strong>GRADE: </strong> " + expected.grade + "<br/><strong>CREDITS: </strong>: " + expected.credits;
+            $('<td></td>').html(actualDisp).appendTo(thisFieldDOM);
+            $('<td></td>').html(expectedDisp).appendTo(thisFieldDOM);
+            //Mark the incorrect fields
+            if(!field.isValid){
+                //This field is valid - mark it with the invalid row class
+                thisFieldDOM.addClass('invalid-field-row');
+            }
+            return thisFieldDOM;
+        };
+    </script>
+</body>

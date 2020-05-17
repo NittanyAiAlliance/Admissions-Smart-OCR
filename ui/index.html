@@ -38,6 +38,78 @@
             <button id="upload-next-button" class="btn btn-outline-primary">Next >>></button>
         </div>
     </div>
+    <div class="modal fade" id="uploading-modal">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <span class="spinner-border text-dark" role="status"></span>
+                    </div>
+                    <h4 class="w-100 text-center mt-2">Uploading transcript...</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="user-info-modal">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Personal Information</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="user-full-name" class="mr-sm-2">Full Name:</label>
+                            <input type="text" class="form-control" id="user-full-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-address" class="mr-sm-2">Home Address:</label>
+                            <input type="text" class="form-control" id="user-address">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-gpa" class="mr-sm-2">GPA:</label>
+                            <input type="text" class="form-control" id="user-gpa">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-sat" class="mr-sm-2">SAT Score:</label>
+                            <input type="text" class="form-control" id="user-sat">
+                        </div>
+                        <button id="skip-pi" type="button" class="btn btn-outline-danger">Skip</button>
+                        <button id="submit-pi" type="button" class="btn btn-outline-primary float-right">Advance >>></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="hs-info-modal">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">High School Information</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="hs-name" class="mr-sm-2">High School Name:</label>
+                            <input type="text" class="form-control" id="hs-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="hs-address" class="mr-sm-2">High School Address:</label>
+                            <input type="text" class="form-control" id="hs-address">
+                        </div>
+                        <div class="form-group">
+                            <label for="hs-phone" class="mr-sm-2">High School Phone Number:</label>
+                            <input type="text" class="form-control" id="hs-phone">
+                        </div>
+                        <button id="skip-hs" type="button" class="btn btn-outline-danger">Skip</button>
+                        <button id="submit-hs" type="button" class="btn btn-outline-primary float-right">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="js/utils.js"></script>
     <script src="js/grab.js"></script>
     <script src="js/posts.js"></script>
@@ -45,6 +117,35 @@
         var hasDroppedFile = false;
         var uploadForm = $('#upload-container');
         var droppedFile;
+        var loadingModal = $('#uploading-modal');
+
+        $(document).ready(function(){
+            $('#user-info-modal').modal();
+        });
+
+        $('#skip-pi').click(function(){
+            $('#user-info-modal').modal('hide');
+        });
+
+        $('#submit-pi').click(function(){
+            sessionStorage.setItem("name", $('#user-full-name').val());
+            sessionStorage.setItem("address", $('#user-address').val());
+            sessionStorage.setItem("gpa", $('#user-gpa').val());
+            sessionStorage.setItem("sat", $('#user-sat').val());
+            $('#user-info-modal').modal('hide');
+            $('#hs-info-modal').modal();
+        });
+
+        $('#skip-hs').click(function(){
+            $('#hs-info-modal').modal('hide');
+        });
+
+        $('#submit-hs').click(function(){
+            sessionStorage.setItem("hs-name", $('#hs-name').val());
+            sessionStorage.setItem("hs-address", $('#hs-address').val());
+            sessionStorage.setItem("hs-phone", $('#hs-phone').val());
+            $('#hs-info-modal').modal('hide');
+        });
 
         uploadForm.on('drag dragstart dragend dragover dragenter dragleave drop', function(e){
             e.preventDefault();
@@ -58,10 +159,12 @@
         });
 
         $('#upload-next-button').click(function(){
+            loadingModal.modal();
             var fileEntry = $('#transcript-upload').prop("files")[0];
             var fileReader = new FileReader();
             fileReader.addEventListener("load", function(){
                 var file = fileReader.result;
+                sessionStorage.setItem("file", file);
                 sendFilePost(file, handleFilePostResult);
             });
             if(fileEntry){

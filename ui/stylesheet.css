@@ -1,5 +1,6 @@
 body {
     background-color: rgba(0, 0, 0, 0);
+    overflow-x: hidden;
 }
 
 #transcript-upload {
@@ -104,15 +105,19 @@ body {
 }
 
 #review-classes-container{
-    padding-left: 64px !important;
+    padding-right: 64px !important;
 }
 
 .class-listing {
     padding-top: 8px;
 }
 
-.year-listing {
-    padding: 32px;
+.class-name {
+    width: 100%;
+}
+
+#all-class-container {
+    padding: 16px;
     margin-bottom: 16px;
     border: 1px solid rgba(0,0,0,0.3);
     border-radius: 16px;
@@ -121,4 +126,46 @@ body {
 
 .drag-class-handle:hover {
     cursor: grab;
+}
+
+
+.chart-danger {
+    fill: red;
+    stroke: red;
+}
+
+.chart-success {
+    stroke: #00254d;
+}
+
+.ct-series-a .ct-line,
+.ct-series-a .ct-point{
+    stroke: red;
+}
+
+.ct-series-b .ct-line,
+.ct-series-b .ct-point{
+    stroke: #00254d;
+}
+
+.ct-label{
+    stroke: black;
+    color: white;
+    font-size: 1.5rem;
+    stroke-opacity: 0.2;
+    fill: #f2f2f2;
+}
+
+.dashboard-row {
+    padding: 3rem;
+    background: #f2f2f2;
+    height: 500px;
+}
+
+.major-chart {
+    height: 350px;
+}
+
+.invalid-field-row {
+    background-color: rgba(255, 0, 0, 0.2);
 }

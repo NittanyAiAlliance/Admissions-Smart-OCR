@@ -9,3 +9,12 @@ function sendFilePost(file, onComplete){
     };
     sendRequest(apiNodeMap.postFile, sendFileCmd, onComplete);
 }
+
+function sendSubmissionPost(user, fields, file, onComplete){
+    let sendSubmissionCmd = {
+        user: user,
+        fields: fields,
+        file: file
+    };
+    sendRequest(apiNodeMap.postSubmission, sendSubmissionCmd, onComplete);
+}

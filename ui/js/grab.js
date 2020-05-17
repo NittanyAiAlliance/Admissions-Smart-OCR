@@ -5,3 +5,7 @@
 function getApiToken(onComplete){
     sendNoParamRequest(apiNodeMap.getToken, onComplete);
 }
+
+function getSubmissions(onComplete){
+    sendRequest(apiNodeMap.getSubmissions, {vibe: "check"},onComplete);
+}
