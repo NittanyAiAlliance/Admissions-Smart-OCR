@@ -19,13 +19,20 @@ public class GenericCourseManager {
         this.database = new DatabaseInteraction();
     }
 
+    /**
+     * Get all of the generic course options ~ organized by generic subject areas
+     * @return list of all generic subject areas, containing all of the generic course options
+     */
     public List<GenericSubjectArea> getAllGenericCourseOptions(){
+        //TODO: combine these queries into a join
         List<GenericSubjectArea> genericSubjectAreas = new ArrayList<>();
         String getSubjectsSql = "SELECT * FROM SUBJECT_AREAS";
         PreparedStatement getSubjectsStmt = database.prepareStatement(getSubjectsSql);
         try {
+            //Get the generic subject areas
             ResultSet getCoursesResults = database.query(getSubjectsStmt);
             while(getCoursesResults.next()){
+                //Parse this generic subject area
                 String subjectCode = getCoursesResults.getString("CODE");
                 String subjectName = getCoursesResults.getString("NAME");
                 GenericSubjectArea subjectArea = new GenericSubjectArea(subjectCode, subjectName);
@@ -36,6 +43,7 @@ public class GenericCourseManager {
                     getCoursesStmt.setString(1, subjectCode);
                     ResultSet courseResults = database.query(getCoursesStmt);
                     while(courseResults.next()){
+                        //Parse the generic course options for this generic subject area
                         String courseName = courseResults.getString("COURSE_NAME");
                         String courseCode = courseResults.getString("COURSE_CODE");
                         subjectArea.addCourse(new GenericCourse(courseCode, courseName));
@@ -51,7 +59,13 @@ public class GenericCourseManager {
         return genericSubjectAreas;
     }
 
+    /**
+     * Convert a list of generic subject areas into a JSONObject containing a JSONArray of the subject areas and courses
+     * @param subjectAreas list of subject areas to convert to JSON
+     * @return JSON Object representation of the generic subject area list
+     */
     public JSONObject convertCourseOptionsToJson(List<GenericSubjectArea> subjectAreas){
+        //TODO: move convert to json functionality into the type classes
         JSONArray subjectAreaArray = new JSONArray();
         for (GenericSubjectArea thisSubject : subjectAreas) {
             JSONObject thisSubjectObj = new JSONObject();
