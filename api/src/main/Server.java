@@ -4,10 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
-import main.handlers.FilePostHandler;
-import main.handlers.GetSubmissionHandler;
-import main.handlers.SubmissionHandler;
-import main.handlers.TokenRequestHandler;
+import main.handlers.*;
 
 import javax.net.ssl.*;
 import java.io.InputStream;
