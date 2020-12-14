@@ -48,7 +48,7 @@
                 </div>
               </div>
               <div class="md-layout">
-                <p>* Class editing rows *</p>
+                <ClassEditingRow/>
               </div>
             </div>
             <TranscriptPreviewPane />
@@ -62,9 +62,10 @@
 import AppNavDrawer from './AppNavDrawer'
 import get from '@/get';
 import TranscriptPreviewPane from "./TranscriptPreviewPane";
+import ClassEditingRow from "./ClassEditingRow";
 export default {
   name: "TranscriptViewer",
-  components: {TranscriptPreviewPane, AppNavDrawer},
+  components: {ClassEditingRow, TranscriptPreviewPane, AppNavDrawer},
   data () {
     return {
       menuVisible: false
