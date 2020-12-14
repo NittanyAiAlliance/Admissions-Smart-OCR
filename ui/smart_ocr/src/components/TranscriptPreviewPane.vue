@@ -17,14 +17,6 @@ export default {
       previewImages: [],
       loading: false
     }
-  },
-  props : {
-    image: {
-      type: String
-    }
-  },
-  created() {
-
   }
 }
 </script>
