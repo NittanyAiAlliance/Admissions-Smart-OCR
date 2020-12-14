@@ -11,10 +11,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "@progress/kendo-listview-vue-wrapper": "^2020.3.1022",
-    "@progress/kendo-theme-material": "^3.21.2",
-    "@progress/kendo-ui": "^2020.3.1021",
-    "vue": "^2.5.2",
+    "axios": "^0.21.0",
+    "bootstrap": "^4.5.3",
+    "bootstrap-vue": "^2.19.0",
+    "popper.js": "^1.16.1",
+    "vue": "^2.6.12",
+    "vue-axios": "^3.2.0",
+    "vue-material": "^1.0.0-beta-15",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
