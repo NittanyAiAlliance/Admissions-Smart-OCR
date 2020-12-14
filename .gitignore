@@ -33,3 +33,4 @@ OCR scripts/subject_code.xlsx
 OCR scripts/final.json
 OCR scripts/__pycache__/spacyparse.cpython-37.pyc
 api/.idea/libraries/lib.xml
+ui/smart_ocr/src/assets/script.png
