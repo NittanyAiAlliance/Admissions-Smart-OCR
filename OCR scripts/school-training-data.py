@@ -46,4 +46,20 @@ TRAIN_SCHOOL_DATA =[
     ("8/17/2016 Student Transcript Page 1 of 1", {"entities": [(0, 9, "EXTRA"), (10, 17, "EXTRA"), (18, 28, "EXTRA"), (29, 33, "EXTRA"), (34, 35, "EXTRA"), (36, 37, "EXTRA"), (3, 9, "EXTRA")]}),
     ("To: From: Graduate Building", {"entities": [(0, 3, "EXTRA"), (4, 9, "EXTRA"), (10, 18, "SCHOOL_NAME"), (19, 26, "EXTRA")]}),
     ("PA 17033", {"entities": [(0, 2, "STATE"), (3, 7, "ZIP_CODE")]}),
+
+
+    # https://psu.app.box.com/file/462135609933
+    # Top Panel with school information
+    ("Garnet Valley High School", {"entities": [(0, 6, "SCHOOL_NAME"), (7, 13, "SCHOOL_NAME"), (14, 18, "SCHOOL_NAME"), (19, 24, "SCHOOL_NAME")]}),
+    ("Garnet Valley School District", {"entities": [(0, 6, "EXTRA"), (7, 13, "EXTRA"), (14, 20, "EXTRA"), (21, 28, "EXTRA")]}),
+    ("552 Smithbridge Road", {"entities": [(0, 3, "ADDRESS"), (4, 15, "ADDRESS"), (16, 19, "ADDRESS")]}),
+    ("Glen Mills, PA 19342", {"entities": [(0, 4, "CITY"), (5, 11, "CITY"), (12, 14, "STATE"), (15, 19, "ZIP_CODE")]}),
+    ("Phone: 610-5797717 Fax: 610-579-7799 CEEB Code: 391537", {"entities": [(0, 6, "EXTRA"), (7, 18, "EXTRA"), (19, 23, "EXTRA"), (24, 36, "EXTRA"), (37, 41, "EXTRA"), (42, 47, "EXTRA"), (48, 53, "CEEB_CODE")]}),
+
+
+    # https://psu.app.box.com/file/473830370312
+    # Top Panel with School Info
+    ("Jul 29 2016 Saint Anthony's High School", {"entities": [(0, 3, "EXTRA"), (4, 6, "EXTRA"), (7, 11, "EXTRA"), (12, 17, "SCHOOL_NAME"), (18, 27, "SCHOOL_NAME"), (28, 32, "SCHOOL_NAME"), (33, 38, "SCHOOL_NAME")]}),
+    ("275 Wolf Hill Road South Huntington, New York 11747-1394", {"entities": [(0, 3, "ADDRESS"), (4, 8, "ADDRESS"), (9, 13, "ADDRESS"), (14, 18, "ADDRESS"), (19, 24, "CITY"), (25, 36, "CITY"), (37, 40, "STATE"), (41, 45, "STATE"), (46, 55, "ZIP_CODE")]}),
+    ("(631)271-2020 CEEB Code #: 335215", {"entities": [(0, 13, "EXTRA"), (14, 18, "EXTRA"), (19, 23, "EXTRA"), (24, 26, "EXTRA"), (27, 32, "CEEB_CODE")]}),
 ]
