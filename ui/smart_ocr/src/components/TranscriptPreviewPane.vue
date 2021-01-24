@@ -25,5 +25,7 @@ export default {
   #transcript-img{
     max-height: calc(100vh - 112px);
     width: auto;
+    border: 1px solid rgb(0,0,0);
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
   }
 </style>

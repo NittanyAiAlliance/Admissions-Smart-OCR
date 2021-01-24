@@ -1,5 +1,15 @@
 <template>
   <div class="md-layout-item" id="edit-pane">
+    <md-dialog :md-active.sync="showConfirmSubmit">
+      <md-dialog-title>Submit Confirmation</md-dialog-title>
+      <md-dialog-content>
+        <p>Are you sure you would like to submit this transcript?</p>
+      </md-dialog-content>
+      <md-dialog-actions>
+        <md-button class="alert-warning" @click="showConfirmSubmit = false">No, Go Back</md-button>
+        <md-button class="md-primary" @click="handleSubmit">Yes, Confirm Submit</md-button>
+      </md-dialog-actions>
+    </md-dialog>
     <h1>Edit Transcript Information</h1>
     <md-divider />
     <div class="md-layout">
@@ -50,7 +60,18 @@
             v-for="course in transcript.COURSES"
             v-bind:course="course"
             v-bind:key="course.name" />
+          <md-list-item>
+            <div class="md-layout md-alignment-center-center">
+              <md-button class="md-icon-button md-raised">
+                <md-icon>add</md-icon>
+              </md-button>
+            </div>
+          </md-list-item>
         </md-list>
+        <div class="md-layout md-alignment-bottom-right">
+          <md-button class="md-raised alert-warning">Discard Changes</md-button>
+          <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
+        </div>
       </div>
     </div>
   </div>
@@ -64,7 +85,20 @@ export default {
   data () {
     return {
       isLoading: true,
+      showConfirmSubmit: false,
+      showConfirmDiscardChanges: false,
     };
+  },
+  methods: {
+    handleSubmitClick: function(e){
+      this.showConfirmSubmit = true;
+    },
+    handleDiscardChangesClick: function(e){
+       this.showConfirmDiscardChanges = true;
+    },
+    handleSubmit: function(){
+
+    }
   },
   props: ['transcript']
 }
@@ -77,6 +111,6 @@ export default {
   #edit-pane {
     border-left: 2px solid #002D62;
     overflow-y: scroll;
-    max-height: calc(100vh - 112px) !important;
+    max-height: calc(100vh - 96px) !important;
   }
 </style>

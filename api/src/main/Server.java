@@ -80,6 +80,8 @@ public class Server {
         server.createContext("/file/post", new FilePostHandler());
         server.createContext("/submission/post", new SubmissionHandler());
         server.createContext("/submission/get", new GetSubmissionHandler());
+        server.createContext("/queue/fetch", new GetTranscriptQueueHandler());
+        server.createContext("/queue/fetch/one", new GetQueuedTranscriptHandler());
         return server;
     }
 }

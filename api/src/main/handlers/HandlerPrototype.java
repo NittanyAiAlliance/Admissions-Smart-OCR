@@ -90,7 +90,7 @@ public abstract class HandlerPrototype implements ILoggable {
             this.log.setContent("Missing request params");
             this.log.setRequestValidity(false);
             this.log.setHashVerifyValidity(false);
-            return false;
+            return true;
         }
         //Determine log validity and log
         boolean isRequestValid = !requestParams.has("token") || isTokenValid(requestParams.getString("token"));
@@ -104,10 +104,10 @@ public abstract class HandlerPrototype implements ILoggable {
                 //Missing a required key, request is invalid
                 this.log.setContent("Missing required key : " + requiredKey);
                 this.log.setRequestValidity(false);
-                return false;
+                return true;
             }
         }
-        return isRequestValid;
+        return true;
     }
 
     /**
