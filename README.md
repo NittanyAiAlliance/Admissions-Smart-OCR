@@ -10,6 +10,6 @@ The OCR API performs optical character recognition and tagging using Amazon Text
 
 ## Set Up
 #### UI
-The UI is run via an npm script. To start the server from the UI directory, use console command: ```npm run dev```
+The UI is run via an npm script. To start the server from the UI directory, use console command: ```npm install``` and ```npm run dev```
 #### Java API
 Build the Java application to a jar. The application can then be run with ```java -jar api.jar```. This repo does not contain the production database properties file, which is necessary for the running with live data.
