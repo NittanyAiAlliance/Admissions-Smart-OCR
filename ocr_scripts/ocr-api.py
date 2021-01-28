@@ -15,13 +15,26 @@ import csv
 import plac
 import random
 
-
 api = Flask(__name__)
 
-@api.route('/', methods=['POST'])
+"""
+@api {post} /api Upload File for OCR Processing
+@apiName ProcessFile
+
+@apiParam {String} file Base64 Encoded transcript file
+
+@apiSuccess {String} data JSON result of OCR
+"""
+@api.route('/api/', methods=['POST'])
 def process_transcript():
-    img_str = request.get_json('img_str')['file']
+
+    print('Received API call') #DEBUG
+
+    img_str = request.get_json()['file']
     img_str = base64.b64decode(img_str)
+
+    print('Decoded to: ' + img_str) #DEBUG
+
     table_csv = get_table_csv_results(bytearray(img_str))
     output_file = 'output.csv'
 
@@ -31,13 +44,22 @@ def process_transcript():
 
     # show the results
     print('CSV OUTPUT FILE: ', output_file)
-    os.system("python main2.py output.csv")
+    os.system("python main.py output.csv")
     os.system("python course_codes_final.py output.json")
     result = open("final.json", "r")
     result_str = result.read()
     print(result_str)
     return result_str
 
+"""
+@api {get} /api Check OCR API Status
+@apiName GetStatus
+
+@apiSuccess {String} Smart OCR is running string
+"""
+@api.route('/api/', methods=['GET'])
+def get_status():
+    return "Smart OCR is running"
 
 def get_rows_columns_map(table_result, blocks_map):
     rows = {}
@@ -73,15 +95,21 @@ def get_text(result, blocks_map):
 
 
 def get_table_csv_results(bytes_test):
+
+    print('Received textract call') #DEBUG
     # process using image bytes
     # get the results
-    client = boto3.client('textract',region_name='us-east-2')
+    client = boto3.client('textract', region_name='us-east-2')
+
+    print('Created client '+client) #DEBUG
 
     response = client.analyze_document(Document={'Bytes': bytes_test}, FeatureTypes=['TABLES'])
 
+    print('Got txtrct response '+response) #DEBUG
+
     # Get the text blocks
     blocks = response['Blocks']
-    pprint(blocks)
+    print(blocks)
 
     blocks_map = {}
     table_blocks = []
