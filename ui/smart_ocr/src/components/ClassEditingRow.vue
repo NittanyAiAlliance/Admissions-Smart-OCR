@@ -1,5 +1,5 @@
 <template>
-  <md-list-item class="classEditingRow">
+  <md-list-item class="classEditingRow" > 
     <div class="md-layout">
       <div class="md-layout-item md-size-10 course-actions-col">
         <md-button class="md-icon-button md-raised md-primary" @click="handleConfirmClick">
@@ -62,6 +62,7 @@
                 <md-button class="md-icon-button md-raised md-accent">
                   <md-icon>delete</md-icon>
                 </md-button>
+                
               </div>
             </div>
           </md-card-content>

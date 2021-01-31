@@ -59,15 +59,18 @@
           <ClassEditingRow
             v-for="course in transcript.COURSES"
             v-bind:course="course"
-            v-bind:key="course.name" />
-          <md-list-item>
-            <div class="md-layout md-alignment-center-center">
-              <md-button class="md-icon-button md-raised">
-                <md-icon>add</md-icon>
-              </md-button>
-            </div>
-          </md-list-item>
+            v-bind:key="course.name"
+             />
+             <md-list-item>
+              <div class="md-layout md-alignment-center-center">
+                <md-button class="md-icon-button md-raised" @click="handleAddCourse"> 
+                  <md-icon>add</md-icon>
+                </md-button>
+              </div>
+            </md-list-item>
+ 
         </md-list>
+        
         <div class="md-layout md-alignment-bottom-right">
           <md-button class="md-raised alert-warning">Discard Changes</md-button>
           <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
@@ -79,6 +82,7 @@
 
 <script>
 import ClassEditingRow from "./ClassEditingRow"
+
 export default {
   name: "TranscriptEditPane",
   components: {ClassEditingRow},
@@ -87,8 +91,11 @@ export default {
       isLoading: true,
       showConfirmSubmit: false,
       showConfirmDiscardChanges: false,
+      
+      
     };
   },
+  
   methods: {
     handleSubmitClick: function(e){
       this.showConfirmSubmit = true;
@@ -98,7 +105,17 @@ export default {
     },
     handleSubmit: function(){
 
-    }
+    },
+    handleAddCourse: function(e){
+      
+      transcript.COURSES.push({
+        name: '',
+        grade: '',
+        credits: '',
+      });
+ }
+
+  
   },
   props: ['transcript']
 }
