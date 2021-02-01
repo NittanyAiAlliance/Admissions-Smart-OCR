@@ -95,23 +95,34 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the submission of a completed transcript
+     * @param e event arg object
+     */
     handleSubmitClick: function(e){
       this.showConfirmSubmit = true;
     },
+    /**
+     * Handle discarding all changes made on a transcript
+     * @param e event arg object
+     */
     handleDiscardChangesClick: function(e){
        this.showConfirmDiscardChanges = true;
     },
-    handleSubmit: function(){
-
-    },
+    /**
+     * Handle adding a course to the transcript DOM
+     * @param e event arg object
+     */
     handleAddCourse: function(e){
+      //Push an empty course into the course transcript array
       this.$props.transcript.COURSES.push({
         name: '',
         grade: '',
         credits: '',
       });
+      //Force the component to update and display the new course
       this.$forceUpdate();
-    }
+    },
   },
   props: ['transcript']
 }
