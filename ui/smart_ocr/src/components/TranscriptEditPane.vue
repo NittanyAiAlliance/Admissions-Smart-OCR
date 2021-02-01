@@ -60,7 +60,7 @@
             v-for="course in transcript.COURSES"
             v-bind:course="course"
             v-bind:key="course.name"
-             />
+            @on-delete="handleDeleteCourse" />
              <md-list-item>
               <div class="md-layout md-alignment-center-center">
                 <md-button class="md-icon-button md-raised" @click="handleAddCourse">
@@ -68,9 +68,7 @@
                 </md-button>
               </div>
             </md-list-item>
-
         </md-list>
-
         <div class="md-layout md-alignment-bottom-right">
           <md-button class="md-raised alert-warning">Discard Changes</md-button>
           <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
@@ -123,6 +121,27 @@ export default {
       //Force the component to update and display the new course
       this.$forceUpdate();
     },
+    /**
+     * Handle a delete course event from a ClassEditingRow DOM object
+     * @param props deleted course props
+     */
+    handleDeleteCourse: function(props) {
+      //Find the index value of the deleted class record
+      let courseIndex = this.$props.transcript.COURSES.findIndex((course) => {
+        return course.name === props.name
+      });
+      //Remove the course record at the index value
+      this.$props.transcript.COURSES.splice(courseIndex, 1);
+      //Force the component to update and stop displaying the new course
+      this.$forceUpdate();
+    },
+    /**
+     * Handle submission of a completed transcript
+     * @param e event arg object
+     */
+    handleSubmit: function(e) {
+
+    }
   },
   props: ['transcript']
 }
