@@ -14,8 +14,11 @@ from spacy.util import minibatch, compounding
 import csv
 import plac
 import random
+import logging
 
 api = Flask(__name__)
+
+logging.basicConfig(level=logging.DEBUG)
 
 """
 @api {post} /api Upload File for OCR Processing
@@ -28,12 +31,10 @@ api = Flask(__name__)
 @api.route('/api/', methods=['POST'])
 def process_transcript():
 
-    print('Received API call') #DEBUG
+    api.logger.error('Received API call') #DEBUG
 
     img_str = request.get_json()['file']
     img_str = base64.b64decode(img_str)
-
-    print('Decoded to: ' + img_str) #DEBUG
 
     table_csv = get_table_csv_results(bytearray(img_str))
     output_file = 'output.csv'
@@ -43,12 +44,12 @@ def process_transcript():
         fout.write(table_csv)
 
     # show the results
-    print('CSV OUTPUT FILE: ', output_file)
+    api.logger.error('CSV OUTPUT FILE: ', output_file)
     os.system("python main.py output.csv")
     os.system("python course_codes_final.py output.json")
     result = open("final.json", "r")
     result_str = result.read()
-    print(result_str)
+    api.logger.error(result_str)
     return result_str
 
 """
@@ -61,55 +62,18 @@ def process_transcript():
 def get_status():
     return "Smart OCR is running"
 
-def get_rows_columns_map(table_result, blocks_map):
-    rows = {}
-    for relationship in table_result['Relationships']:
-        if relationship['Type'] == 'CHILD':
-            for child_id in relationship['Ids']:
-                cell = blocks_map[child_id]
-                if cell['BlockType'] == 'CELL':
-                    row_index = cell['RowIndex']
-                    col_index = cell['ColumnIndex']
-                    if row_index not in rows:
-                        # create new row
-                        rows[row_index] = {}
-
-                    # get the text value
-                    rows[row_index][col_index] = get_text(cell, blocks_map)
-    return rows
-
-
-def get_text(result, blocks_map):
-    text = ''
-    if 'Relationships' in result:
-        for relationship in result['Relationships']:
-            if relationship['Type'] == 'CHILD':
-                for child_id in relationship['Ids']:
-                    word = blocks_map[child_id]
-                    if word['BlockType'] == 'WORD':
-                        text += word['Text'] + ' '
-                    if word['BlockType'] == 'SELECTION_ELEMENT':
-                        if word['SelectionStatus'] == 'SELECTED':
-                            text += 'X '
-    return text
-
-
 def get_table_csv_results(bytes_test):
 
-    print('Received textract call') #DEBUG
+    api.logger.error('Received textract call') #DEBUG
     # process using image bytes
     # get the results
     client = boto3.client('textract', region_name='us-east-2')
 
-    print('Created client '+client) #DEBUG
-
     response = client.analyze_document(Document={'Bytes': bytes_test}, FeatureTypes=['TABLES'])
-
-    print('Got txtrct response '+response) #DEBUG
 
     # Get the text blocks
     blocks = response['Blocks']
-    print(blocks)
+    api.logger.error(blocks)
 
     blocks_map = {}
     table_blocks = []
@@ -146,6 +110,36 @@ def generate_table_csv(table_result, blocks_map, table_index):
     csv += '\n\n\n'
     return csv
 
+def get_rows_columns_map(table_result, blocks_map):
+    rows = {}
+    for relationship in table_result['Relationships']:
+        if relationship['Type'] == 'CHILD':
+            for child_id in relationship['Ids']:
+                cell = blocks_map[child_id]
+                if cell['BlockType'] == 'CELL':
+                    row_index = cell['RowIndex']
+                    col_index = cell['ColumnIndex']
+                    if row_index not in rows:
+                        # create new row
+                        rows[row_index] = {}
+
+                    # get the text value
+                    rows[row_index][col_index] = get_text(cell, blocks_map)
+    return rows
+
+def get_text(result, blocks_map):
+    text = ''
+    if 'Relationships' in result:
+        for relationship in result['Relationships']:
+            if relationship['Type'] == 'CHILD':
+                for child_id in relationship['Ids']:
+                    word = blocks_map[child_id]
+                    if word['BlockType'] == 'WORD':
+                        text += word['Text'] + ' '
+                    if word['BlockType'] == 'SELECTION_ELEMENT':
+                        if word['SelectionStatus'] == 'SELECTED':
+                            text += 'X '
+    return text
 
 if __name__ == "__main__":
     api.run()

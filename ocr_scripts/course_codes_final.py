@@ -23,6 +23,7 @@ def course_codes(input):
 
     with open('final.json', 'w') as outfile:
         json.dump(data, outfile)
+        
 if __name__ == "__main__":
     relative_path = sys.argv[1]
 
