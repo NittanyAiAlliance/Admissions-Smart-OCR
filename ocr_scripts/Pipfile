@@ -9,6 +9,8 @@ boto3 = "*"
 flask = "*"
 pandas = "*"
 fuzzywuzzy = "*"
+xlrd = "*"
+openpyxl = "*"
 
 [dev-packages]
 

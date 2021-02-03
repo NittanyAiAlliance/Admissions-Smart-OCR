@@ -15,6 +15,7 @@ import csv
 import plac
 import random
 import logging
+from ocr_model import process_ocr
 
 api = Flask(__name__)
 
@@ -31,25 +32,19 @@ logging.basicConfig(level=logging.DEBUG)
 @api.route('/api/', methods=['POST'])
 def process_transcript():
 
-    api.logger.error('Received API call') #DEBUG
+    api.logger.info('Received transcript POST call')
 
+    # Decode request image to base 64
     img_str = request.get_json()['file']
     img_str = base64.b64decode(img_str)
 
     table_csv = get_table_csv_results(bytearray(img_str))
-    output_file = 'output.csv'
 
-    # replace content
-    with open(output_file, "wt") as fout:
-        fout.write(table_csv)
-
-    # show the results
-    api.logger.error('CSV OUTPUT FILE: ', output_file)
-    os.system("python main.py output.csv")
-    os.system("python course_codes_final.py output.json")
-    result = open("final.json", "r")
-    result_str = result.read()
-    api.logger.error(result_str)
+    # Process OCR on resulting CSV
+    result_str = process_ocr(table_csv)
+    
+    # Pass result
+    api.logger.info(result_str)
     return result_str
 
 """
