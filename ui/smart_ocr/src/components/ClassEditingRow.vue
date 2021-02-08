@@ -16,19 +16,19 @@
                   <div class="md-layout-item md-size-50">
                     <md-field>
                       <label>Course Name</label>
-                      <md-input v-model="this.course.name"></md-input>
+                      <md-input :value="this.course.name" @change="changeName(item,$event)"></md-input>
                     </md-field>
                   </div>
                   <div class="md-layout-item md-size-25">
                     <md-field>
                       <label>Grade</label>
-                      <md-input v-model="this.course.grade"></md-input>
+                      <md-input :value="this.course.grade" @change="changeGrade(item,$event)"></md-input>
                     </md-field>
                   </div>
                   <div class="md-layout-item md-size-25">
                     <md-field>
                       <label>Credits</label>
-                      <md-input v-model="this.course.credits"></md-input>
+                      <md-input :value="this.course.credits" @change="changeCredits(item,$event)"></md-input>
                     </md-field>
                   </div>
                 </div>
@@ -63,6 +63,7 @@
                   <md-icon>delete</md-icon>
                 </md-button>
               </div>
+              
             </div>
           </md-card-content>
         </md-card>
@@ -80,9 +81,12 @@ export default {
       showConfirmDelete : false,
       state: {
         isConfirmed : false
-      }
+      },
     }
-  },
+ },
+
+  
+
   methods: {
     /**
      * Handle delete event from delete button
@@ -91,8 +95,26 @@ export default {
     handleDelete: function(e){
       this.$emit('on-delete', {
         name : this.course.name
-      });
+      })
     },
+    changeName: function(item, event){
+      console.log("Old name: " + this.course.name + "New name: " + 
+      event.target.value); //Old name and then new name
+      this.course.name = event.target.value; //Assignment change
+    },
+
+    changeGrade: function(item, event){
+      console.log("Old grade value: " + this.course.grade + "New grade value: " + 
+      event.target.value); //Old grade and then new grade
+      this.course.grade = event.target.value; //Assignment change
+    },
+
+    changeCredits: function(item, event){
+      console.log("Old credit value: " + this.course.credits + "New credit value: " + 
+      event.target.value); //Old value and then new value
+      this.course.credits = event.target.value; //Assignment change
+    },
+
    /**
      * Toggle the confirmation of this class editing row on click
      * @param e event params
@@ -102,6 +124,11 @@ export default {
       this.state.isConfirmed = !this.state.isConfirmed;
     },
   },
+
+  watch: {
+
+  },
+
   props: ["course"],
 }
 </script>
