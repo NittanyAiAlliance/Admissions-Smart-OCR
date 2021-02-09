@@ -59,14 +59,15 @@
           <ClassEditingRow
             v-for="course in transcript.COURSES"
             v-bind:course="course"
-            v-bind:key="course.name" />
-          <md-list-item>
-            <div class="md-layout md-alignment-center-center">
-              <md-button class="md-icon-button md-raised">
-                <md-icon>add</md-icon>
-              </md-button>
-            </div>
-          </md-list-item>
+            v-bind:key="course.name"
+            @on-delete="handleDeleteCourse" />
+             <md-list-item>
+              <div class="md-layout md-alignment-center-center">
+                <md-button class="md-icon-button md-raised" @click="handleAddCourse">
+                  <md-icon>add</md-icon>
+                </md-button>
+              </div>
+            </md-list-item>
         </md-list>
         <div class="md-layout md-alignment-bottom-right">
           <md-button class="md-raised alert-warning">Discard Changes</md-button>
@@ -79,6 +80,7 @@
 
 <script>
 import ClassEditingRow from "./ClassEditingRow"
+
 export default {
   name: "TranscriptEditPane",
   components: {ClassEditingRow},
@@ -89,14 +91,55 @@ export default {
       showConfirmDiscardChanges: false,
     };
   },
+
   methods: {
+    /**
+     * Handle the submission of a completed transcript
+     * @param e event arg object
+     */
     handleSubmitClick: function(e){
       this.showConfirmSubmit = true;
     },
+    /**
+     * Handle discarding all changes made on a transcript
+     * @param e event arg object
+     */
     handleDiscardChangesClick: function(e){
        this.showConfirmDiscardChanges = true;
     },
-    handleSubmit: function(){
+    /**
+     * Handle adding a course to the transcript DOM
+     * @param e event arg object
+     */
+    handleAddCourse: function(e){
+      //Push an empty course into the course transcript array
+      this.$props.transcript.COURSES.push({
+        name: '',
+        grade: '',
+        credits: '',
+      });
+      //Force the component to update and display the new course
+      this.$forceUpdate();
+    },
+    /**
+     * Handle a delete course event from a ClassEditingRow DOM object
+     * @param props deleted course props
+     */
+    handleDeleteCourse: function(props) {
+      //Find the index value of the deleted class record
+      let courseIndex = this.$props.transcript.COURSES.findIndex((course) => {
+        return course.name === props.name
+      });
+      //Remove the course record at the index value
+      this.$props.transcript.COURSES.splice(courseIndex, 1);
+      //Force the component to update and stop displaying the new course
+      this.$forceUpdate();
+    },
+    /**
+     * Handle submission of a completed transcript
+     * @param e event arg object
+     */
+    handleSubmit: function(e) {
 
     }
   },

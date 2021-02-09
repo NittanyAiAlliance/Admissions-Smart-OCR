@@ -1,5 +1,5 @@
 <template>
-  <md-list-item class="classEditingRow">
+  <md-list-item class="classEditingRow" >
     <div class="md-layout">
       <div class="md-layout-item md-size-10 course-actions-col">
         <md-button class="md-icon-button md-raised md-primary" @click="handleConfirmClick">
@@ -56,10 +56,10 @@
                 </div>
               </div>
               <div class="md-layout-item md-size-10 course-actions-col">
-                <md-button class="md-icon-button md-raised" @click="handleDrag">
+                <md-button class="md-icon-button md-raised">
                   <md-icon>outlined_flag</md-icon>
                 </md-button>
-                <md-button class="md-icon-button md-raised md-accent">
+                <md-button class="md-icon-button md-raised md-accent" @click="handleDelete">
                   <md-icon>delete</md-icon>
                 </md-button>
               </div>
@@ -84,7 +84,14 @@ export default {
     }
   },
   methods: {
+    /**
+     * Handle delete event from delete button
+     * @param e event params
+     */
     handleDelete: function(e){
+      this.$emit('on-delete', {
+        name : this.course.name
+      });
     },
    /**
      * Toggle the confirmation of this class editing row on click
@@ -94,9 +101,6 @@ export default {
       //Toggle confirmed state
       this.state.isConfirmed = !this.state.isConfirmed;
     },
-    handleDrag: function(e){
-
-    }
   },
   props: ["course"],
 }
