@@ -13,10 +13,12 @@ from spacy.util import minibatch, compounding
 from collections import defaultdict
 from pprint import pprint
 import json
+from course_codes_final import course_codes
 #from train import train
 
 
-def main(file, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
+#def process_ocr(csv_data, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
+def process_ocr(csv_data, model=None, output_dir=None, n_iter=50):
     # selects an existing model or creates a new model
     if model is not None:
         nlp = spacy.load(Path(os.getcwd()+'/model'))  # load existing spaCy model
@@ -37,8 +39,7 @@ def main(file, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
     #             AWS_Textract_keyValues = os.path.join(dirname, filename)
 
     out_dict = {}
-    f = open(Path(file))
-    for ind, line in enumerate(f):
+    for ind, line in enumerate(csv_data):
         text = ''.join(line).replace('"', '').replace(',', '').rstrip('\n')
 
         #text = "College Prep Algebra II A- 1.00"
@@ -90,9 +91,4 @@ def main(file, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
         #         for start, end, label in ents:
         #             entity_scores[(start, end, label)] += score
         #         print(entity_scores)
-    with open("output.json", "w+") as out:
-        json.dump(out_dict, out)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1])
+    return course_codes(out_dict)

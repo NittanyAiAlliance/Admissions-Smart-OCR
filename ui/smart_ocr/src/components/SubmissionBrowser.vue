@@ -14,14 +14,24 @@
       </md-app-drawer>
 
       <md-app-content>
-        <md-card v-for="transcript in transcripts" :key="transcript.PSU_ID">
-          <router-link :to="{ name: 'TranscriptViewer', params: {id: transcript.PSU_ID}}">
-            <md-card-content>
-              <p>{{transcript.PSU_ID}}</p>
-              <p>{{transcript.TIMESTAMP}}</p>
-            </md-card-content>
-          </router-link>
-        </md-card>
+        <div v-if="transcripts.length > 0">
+          <md-card v-for="transcript in transcripts" :key="transcript.PSU_ID">
+            <router-link :to="{ name: 'TranscriptViewer', params: {id: transcript.PSU_ID}}">
+              <md-card-content>
+                <p>{{transcript.PSU_ID}}</p>
+                <p>{{transcript.TIMESTAMP}}</p>
+              </md-card-content>
+            </router-link>
+          </md-card>
+        </div>
+        <div v-if="transcripts.length === 0 && !isLoading">
+          <md-empty-state
+            md-icon="image_search"
+            md-label="No Transcripts Found in Queue"
+            md-description="Thanks for checking in, maybe there will be some later. Here's a button for something to click on">
+            <md-button class="md-primary md-raised">Click Me!</md-button>
+          </md-empty-state>
+        </div>
       </md-app-content>
     </md-app>
   </div>
@@ -36,11 +46,13 @@ export default {
   data () {
     return {
       menuVisible: false,
+      isLoading: true,
       transcripts: []
     }
   },
   created() {
     get.getTranscriptQueue().then(transcripts =>{
+      this.isLoading = false;
       this.transcripts = transcripts.data.queue;
     });
   }

@@ -1,6 +1,5 @@
 package main;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
@@ -33,8 +32,8 @@ public class Server {
      */
     private static void initServer() throws Exception {
         //Create server and address
-        HttpServer server = HttpServer.create(new InetSocketAddress(API_PORT), 0);
-        /*SSLContext sslContext = SSLContext.getInstance("TLS");
+        HttpsServer server = HttpsServer.create(new InetSocketAddress(API_PORT), 0);
+        SSLContext sslContext = SSLContext.getInstance("TLS");
         //Initialize keystore
         char[] password = "password".toCharArray();
         KeyStore keyStore = KeyStore.getInstance("JKS");
@@ -64,7 +63,7 @@ public class Server {
                     ex.printStackTrace();
                 }
             }
-        });*/
+        });
         server = createHandlerContexts(server);
         server.setExecutor(null);
         server.start();
@@ -75,11 +74,13 @@ public class Server {
      * @param server server object without endpoint configuration
      * @return server object with endpoint configuration
      */
-    private static HttpServer createHandlerContexts(HttpServer server){
+    private static HttpsServer createHandlerContexts(HttpsServer server){
         server.createContext("/token/get", new TokenRequestHandler());
         server.createContext("/file/post", new FilePostHandler());
         server.createContext("/submission/post", new SubmissionHandler());
         server.createContext("/submission/get", new GetSubmissionHandler());
+        server.createContext("/queue/fetch", new GetTranscriptQueueHandler());
+        server.createContext("/queue/fetch/one", new GetQueuedTranscriptHandler());
         return server;
     }
 }

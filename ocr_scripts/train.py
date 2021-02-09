@@ -21,7 +21,7 @@ def train(model=None, output_dir=Path(os.getcwd()+'/model'), n_iter=50):
     # add labels
     for _, annotations in TRAIN_DATA:
         for ent in annotations.get("entities"):
-            ner.add_label(ent[2])
+            ner.add_label(ent[2]) # TODO - why are we grabbing this index??
 
     # get names of other pipes to disable them during training
     pipe_exceptions = ["ner", "trf_wordpiecer", "trf_tok2vec"]

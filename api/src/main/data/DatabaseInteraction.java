@@ -1,7 +1,6 @@
 package main.data;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.*;
 import java.util.Properties;
 
@@ -123,5 +122,9 @@ public class DatabaseInteraction {
         } catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
         }
+    }
+
+    public Blob getBlob() throws SQLException{
+        return this.dbConn.createBlob();
     }
 }

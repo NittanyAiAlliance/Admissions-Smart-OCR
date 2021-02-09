@@ -20,7 +20,7 @@ export default {
     const queuedTranscriptCmd = {
       "id": transcriptId
     };
-    return axios.post('/queue/fetch/one', transcriptId);
+    return axios.post('/queue/fetch/one', JSON.stringify(queuedTranscriptCmd));
   },
 
   /**

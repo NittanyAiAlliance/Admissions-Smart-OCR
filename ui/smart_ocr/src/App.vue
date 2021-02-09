@@ -29,5 +29,6 @@ export default {
 
   .md-primary {
     background-color: #002D62 !important;
+    color: white !important;
   }
 </style>
