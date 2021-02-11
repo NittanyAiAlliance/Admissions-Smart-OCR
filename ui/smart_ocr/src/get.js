@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:2020'
+axios.defaults.baseURL = 'https://3.15.215.137:2020/'
 
 export default {
   /**
