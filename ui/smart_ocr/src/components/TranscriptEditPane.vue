@@ -53,26 +53,26 @@
           <span class="md-helper-text">CEEB Code</span>
         </md-field>
       </div>
-      <div class="md-layout" id="classEditingList">
-        <h3>Transcript Courses</h3>
-        <md-list>
-          <ClassEditingRow
-            v-for="course in transcript.COURSES"
-            v-bind:course="course"
-            v-bind:key="course.name"
-            @on-delete="handleDeleteCourse" />
-             <md-list-item>
-              <div class="md-layout md-alignment-center-center">
-                <md-button class="md-icon-button md-raised" @click="handleAddCourse">
-                  <md-icon>add</md-icon>
-                </md-button>
-              </div>
-            </md-list-item>
-        </md-list>
-        <div class="md-layout md-alignment-bottom-right">
-          <md-button class="md-raised alert-warning">Discard Changes</md-button>
-          <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
-        </div>
+    </div>
+    <div class="md-layout" id="classEditingList">
+      <h3>Transcript Courses</h3>
+      <md-list>
+        <ClassEditingRow
+          v-for="course in transcript.COURSES"
+          v-bind:course="course"
+          v-bind:key="course.name"
+          @on-delete="handleDeleteCourse" />
+        <md-list-item>
+          <div class="md-layout md-alignment-center-center">
+            <md-button class="md-icon-button md-raised" @click="handleAddCourse">
+              <md-icon>add</md-icon>
+            </md-button>
+          </div>
+        </md-list-item>
+      </md-list>
+      <div class="md-layout md-alignment-bottom-right">
+        <md-button class="md-raised alert-warning">Discard Changes</md-button>
+        <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
       </div>
     </div>
   </div>
