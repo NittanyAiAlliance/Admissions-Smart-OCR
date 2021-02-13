@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import SubmissionBrowser from '@/components/SubmissionBrowser'
 import SearchTranscripts from '@/components/SearchTranscripts'
 import Dashboard from '@/components/Dashboard'
-import TranscriptViewer from '@/components/TranscriptViewer';
+import TranscriptViewer from '@/components/TranscriptViewer'
 
 Vue.use(Router)
 
