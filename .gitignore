@@ -1,4 +1,3 @@
-
 ui/.idea/workspace.xml
 ui/.idea/ui.iml
 ui/.idea/php.xml
@@ -82,3 +81,5 @@ Admissions-Smart-OCR.iml
 .idea/modules.xml
 .idea/misc.xml
 .idea/libraries/lib.xml
+**/.idea
+**/.vscode
