@@ -27,11 +27,11 @@
 <script>
 import AppNavDrawer from './AppNavDrawer'
 import get from '@/get'
-import TranscriptPreviewPane from "./TranscriptPreviewPane"
-import ClassEditingRow from "./ClassEditingRow"
-import TranscriptEditPane from "./TranscriptEditPane"
+import TranscriptPreviewPane from './TranscriptPreviewPane'
+import ClassEditingRow from './ClassEditingRow'
+import TranscriptEditPane from './TranscriptEditPane'
 export default {
-  name: "TranscriptViewer",
+  name: 'TranscriptViewer',
   components: {TranscriptEditPane, ClassEditingRow, TranscriptPreviewPane, AppNavDrawer},
   data () {
     return {
@@ -40,11 +40,11 @@ export default {
       transcript: {}
     }
   },
-  created() {
+  created () {
     get.getQueuedTranscript(this.$route.params.id).then(response => {
-      this.transcript = response.data;
-      this.isLoading = false;
-    });
+      this.transcript = response.data
+      this.isLoading = false
+    })
   }
 }
 </script>
