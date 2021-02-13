@@ -39,7 +39,7 @@
 
 <script>
 import AppNavDrawer from './AppNavDrawer'
-import get from '@/get';
+import get from '@/get'
 export default {
   name: 'SubmissionBrowser',
   components: {AppNavDrawer},
@@ -50,11 +50,11 @@ export default {
       transcripts: []
     }
   },
-  created() {
-    get.getTranscriptQueue().then(transcripts =>{
-      this.isLoading = false;
-      this.transcripts = transcripts.data.queue;
-    });
+  created () {
+    get.getTranscriptQueue().then(transcripts => {
+      this.isLoading = false
+      this.transcripts = transcripts.data.queue
+    })
   }
 }
 </script>
