@@ -79,17 +79,17 @@
 </template>
 
 <script>
-import ClassEditingRow from "./ClassEditingRow"
+import ClassEditingRow from './ClassEditingRow'
 
 export default {
-  name: "TranscriptEditPane",
+  name: 'TranscriptEditPane',
   components: {ClassEditingRow},
   data () {
     return {
       isLoading: true,
       showConfirmSubmit: false,
-      showConfirmDiscardChanges: false,
-    };
+      showConfirmDiscardChanges: false
+    }
   },
 
   methods: {
@@ -97,49 +97,49 @@ export default {
      * Handle the submission of a completed transcript
      * @param e event arg object
      */
-    handleSubmitClick: function(e){
-      this.showConfirmSubmit = true;
+    handleSubmitClick: function (e) {
+      this.showConfirmSubmit = true
     },
     /**
      * Handle discarding all changes made on a transcript
      * @param e event arg object
      */
-    handleDiscardChangesClick: function(e){
-       this.showConfirmDiscardChanges = true;
+    handleDiscardChangesClick: function (e) {
+      this.showConfirmDiscardChanges = true
     },
     /**
      * Handle adding a course to the transcript DOM
      * @param e event arg object
      */
-    handleAddCourse: function(e){
-      //Push an empty course into the course transcript array
+    handleAddCourse: function (e) {
+      // Push an empty course into the course transcript array
       this.$props.transcript.COURSES.push({
         name: '',
         grade: '',
-        credits: '',
-      });
-      //Force the component to update and display the new course
-      this.$forceUpdate();
+        credits: ''
+      })
+      // Force the component to update and display the new course
+      this.$forceUpdate()
     },
     /**
      * Handle a delete course event from a ClassEditingRow DOM object
      * @param props deleted course props
      */
-    handleDeleteCourse: function(props) {
-      //Find the index value of the deleted class record
+    handleDeleteCourse: function (props) {
+      // Find the index value of the deleted class record
       let courseIndex = this.$props.transcript.COURSES.findIndex((course) => {
         return course.name === props.name
-      });
-      //Remove the course record at the index value
-      this.$props.transcript.COURSES.splice(courseIndex, 1);
-      //Force the component to update and stop displaying the new course
-      this.$forceUpdate();
+      })
+      // Remove the course record at the index value
+      this.$props.transcript.COURSES.splice(courseIndex, 1)
+      // Force the component to update and stop displaying the new course
+      this.$forceUpdate()
     },
     /**
      * Handle submission of a completed transcript
      * @param e event arg object
      */
-    handleSubmit: function(e) {
+    handleSubmit: function (e) {
 
     }
   },
