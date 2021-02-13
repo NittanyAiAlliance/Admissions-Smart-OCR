@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "TranscriptPreviewPane",
+  name: 'TranscriptPreviewPane',
   data () {
     return {
       previewImages: [],
