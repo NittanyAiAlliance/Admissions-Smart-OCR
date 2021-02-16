@@ -11,6 +11,7 @@ pandas = "*"
 fuzzywuzzy = "*"
 xlrd = "*"
 openpyxl = "*"
+plac = "*"
 
 [dev-packages]
 

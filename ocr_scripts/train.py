@@ -12,8 +12,7 @@ def train(model=None, output_dir=Path(os.getcwd()+'/model'), n_iter=50):
     # create the built-in pipeline components and add them to the pipeline
     # nlp.create_pipe works for built-ins that are registered with spaCy
     if "ner" not in nlp.pipe_names:
-        ner = nlp.create_pipe("ner")
-        nlp.add_pipe(ner, last=True)
+        ner = nlp.add_pipe("ner")
     # otherwise, get it so we can add labels
     else:
         ner = nlp.get_pipe("ner")
@@ -21,7 +20,7 @@ def train(model=None, output_dir=Path(os.getcwd()+'/model'), n_iter=50):
     # add labels
     for _, annotations in TRAIN_DATA:
         for ent in annotations.get("entities"):
-            ner.add_label(ent[2]) # TODO - why are we grabbing this index??
+            ner.add_label(ent[2])
 
     # get names of other pipes to disable them during training
     pipe_exceptions = ["ner", "trf_wordpiecer", "trf_tok2vec"]
