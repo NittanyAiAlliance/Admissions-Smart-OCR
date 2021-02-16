@@ -7,7 +7,6 @@ import os
 
 def train(model=None, output_dir=Path(os.getcwd()+'/model'), n_iter=50):
     nlp = spacy.blank("en")  # create blank Language class
-    print("Created blank 'en' model")
 
     # create the built-in pipeline components and add them to the pipeline
     # nlp.create_pipe works for built-ins that are registered with spaCy
