@@ -3,15 +3,10 @@ import json
 import boto3
 import io
 from io import BytesIO
-import sys
-from pprint import pprint
 from flask import Flask, request, json
 import base64
-import pandas as pd
-from pathlib import Path
 import spacy
 from spacy.util import minibatch, compounding
-import csv
 import plac
 import random
 import logging
@@ -19,7 +14,7 @@ from ocr_model import process_ocr
 
 api = Flask(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename='ocr_hist.log', encoding='utf-8', level=logging.DEBUG)
 
 """
 @api {post} /api Upload File for OCR Processing
@@ -40,11 +35,12 @@ def process_transcript():
 
     table_csv = get_table_csv_results(bytearray(img_str))
 
+    api.logger.info('Got CSV ' + table_csv)
+
     # Process OCR on resulting CSV
     result_str = process_ocr(table_csv)
     
-    # Pass result
-    api.logger.info(result_str)
+    # Return response
     return result_str
 
 """
@@ -59,16 +55,14 @@ def get_status():
 
 def get_table_csv_results(bytes_test):
 
-    api.logger.error('Received textract call') #DEBUG
-    # process using image bytes
-    # get the results
+    # Connect to AWS Textract via boto3
     client = boto3.client('textract', region_name='us-east-2')
 
+    # Pass image bytes to Textract, save result
     response = client.analyze_document(Document={'Bytes': bytes_test}, FeatureTypes=['TABLES'])
 
-    # Get the text blocks
+    # Retrieve blocks
     blocks = response['Blocks']
-    api.logger.error(blocks)
 
     blocks_map = {}
     table_blocks = []

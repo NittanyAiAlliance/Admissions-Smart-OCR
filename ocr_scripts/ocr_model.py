@@ -17,8 +17,7 @@ from course_codes_final import course_codes
 #from train import train
 
 
-#def process_ocr(csv_data, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
-def process_ocr(csv_data, model=None, output_dir=None, n_iter=50):
+def process_ocr(csv_data, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
     # selects an existing model or creates a new model
     if model is not None:
         nlp = spacy.load(Path(os.getcwd()+'/model'))  # load existing spaCy model
