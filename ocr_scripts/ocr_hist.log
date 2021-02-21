@@ -531,3 +531,4 @@ Traceback (most recent call last):
     raise IOError(Errors.E053.format(path=config_path, name="config.cfg"))
 OSError: [E053] Could not read config.cfg from C:\Users\joshu\Documents\GitHub\Admissions-Smart-OCR\ocr_scripts\model\config.cfg
 INFO:werkzeug:127.0.0.1 - - [04/Feb/2021 23:43:15] "[35m[1mPOST /api/ HTTP/1.1[0m" 500 -
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)

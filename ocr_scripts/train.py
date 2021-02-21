@@ -1,4 +1,5 @@
 import spacy
+from spacy.training import Example
 from pathlib import Path
 from spacy.util import minibatch, compounding
 from train_data import TRAIN_DATA
@@ -36,12 +37,8 @@ def train(model=None, output_dir=Path(os.getcwd()+'/model'), n_iter=50):
             batches = minibatch(TRAIN_DATA, size=compounding(4.0, 32.0, 1.001))
             for batch in batches:
                 texts, annotations = zip(*batch)
-                nlp.update(
-                    texts,  # batch of texts
-                    annotations,  # batch of annotations
-                    drop=0.5,  # dropout - make it harder to memorise data
-                    losses=losses,
-                )
+                example = Example.from_dict(nlp.make_doc(texts), annotations)
+                nlp.update(example)
             print("Losses", losses)
     # save model to output directory
     if output_dir is not None:
