@@ -7,7 +7,7 @@ import numpy as np
 # Generate NLP, load data and loop
 nlp = English()
 fp = "./train_data.npy"
-TRAIN_DATA = np.load(fp)
+TRAIN_DATA = np.load(fp, allow_pickle=True).tolist()
 
 print("Type done() when finished to save data")
 while 1==1:
@@ -34,5 +34,5 @@ while 1==1:
     TRAIN_DATA.append(data_entry)
 
 # Save to flat file
-np.save(fp, TRAIN_DATA)
+np.save(fp, np.asarray(TRAIN_DATA))
 print("Saved train data. Exiting.")
