@@ -39,10 +39,12 @@
 
 <script>
 import AppNavDrawer from './AppNavDrawer'
+import SubmissionDatatable from './SubmissionDatatable'
 import get from '@/get';
 export default {
   name: 'SubmissionBrowser',
-  components: {AppNavDrawer},
+  components: {AppNavDrawer,SubmissionDatatable},
+  
   data () {
     return {
       menuVisible: false,
