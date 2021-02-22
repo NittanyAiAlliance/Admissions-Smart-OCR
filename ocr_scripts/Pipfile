@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-spacy = "*"
+spacy = "~=3.0.3"
 boto3 = "*"
 flask = "*"
 pandas = "*"
@@ -12,6 +12,8 @@ fuzzywuzzy = "*"
 xlrd = "*"
 openpyxl = "*"
 plac = "*"
+tqdm = "*"
+numpy = "*"
 
 [dev-packages]
 

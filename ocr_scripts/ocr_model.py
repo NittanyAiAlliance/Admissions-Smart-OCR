@@ -14,8 +14,6 @@ from collections import defaultdict
 from pprint import pprint
 import json
 from course_codes_final import course_codes
-#from train import train
-
 
 def process_ocr(csv_data, model=Path(os.getcwd()+'/model'), output_dir=None, n_iter=50):
     # selects an existing model or creates a new model
