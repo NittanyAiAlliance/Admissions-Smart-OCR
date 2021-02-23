@@ -25,12 +25,13 @@ def process_ocr(csv_data):
     print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-last'))
 
     out_dict = {}
-    for ind, line in enumerate(csv_data):
+    for index, text in enumerate(csv_data):
+        print('Processing ' + text)
         text = ''.join(line).replace('"', '').replace(',', '').rstrip('\n')
 
         doc = nlp(text)
 
-        print('Processing ' + text)
+        
 
         linedict = {}
         for ent in doc.ents:

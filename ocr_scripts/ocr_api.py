@@ -77,9 +77,10 @@ def get_status():
 
 def get_train_text(csv_data):
     out = ''
-    for ind, line in enumerate(csv_data):
+    for ind, line in enumerate(csv_data.split('\n')):
         text = ''.join(line).replace('"', '').replace(',', '').rstrip('\n')
-        out = out + text + '\n'
+        if len(text) > 0:
+            out = out + text + '\n'
     return out
 
 
