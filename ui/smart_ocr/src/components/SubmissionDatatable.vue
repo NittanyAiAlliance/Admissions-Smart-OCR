@@ -3,7 +3,7 @@
     <md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
       <md-table-toolbar>
         <div class="md-toolbar-section-start">
-          <h1 class="md-title">Users</h1>
+          <h1 class="md-title">Pending Transcripts</h1>
         </div>
 
         <md-field md-clearable class="md-toolbar-section-end">
@@ -17,12 +17,12 @@
         <md-button class="md-primary md-raised" @click="newUser">Create New User</md-button>
       </md-table-empty-state>
 
-      <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
-        <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-        <md-table-cell md-label="Email" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>
-        <md-table-cell md-label="Campus" md-sort-by="campus">{{ item.campus }}</md-table-cell>
-        <md-table-cell md-label="Residency" md-sort-by="residency">{{ item.residency }}</md-table-cell>
+      <md-table-row slot="md-table-row" slot-scope="{ item }" @click.native="openTranscript(item)">
+          <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
+          <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
+          <md-table-cell md-label="Email" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>
+          <md-table-cell md-label="Campus" md-sort-by="campus">{{ item.campus }}</md-table-cell>
+          <md-table-cell md-label="Residency" md-sort-by="residency">{{ item.residency }}</md-table-cell>
       </md-table-row>
     </md-table>
   </div>
@@ -64,21 +64,21 @@
         {
           id: 3,
           name: "Vera Taleworth",
-          email: "vtt7456",
+          psuId: "vtt7456",
           campus: "Altoona",
           residency: "PA"
         },
         {
           id: 4,
           name: "Lonnie Izkovitz",
-          email: "liz9822",
+          psuId: "liz9822",
           campus: "Berks",
           residency: "CO"
         },
         {
           id: 5,
           name: "Thatcher Stave",
-          email: "tst5667",
+          psuId: "tst5667",
           campus: "University Park",
           residency: "PA"
         },
@@ -86,10 +86,13 @@
     }),
     methods: {
       newUser () {
-        window.alert('Noop')
+        window.alert('Not yet implemented')
       },
       searchOnTable () {
         this.searched = searchByName(this.users, this.search)
+      },
+      openTranscript (item) {
+        this.$router.push({ name: 'TranscriptViewer', params: {id: item.psuId}});
       }
     },
     created () {

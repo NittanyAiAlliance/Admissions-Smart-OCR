@@ -14,16 +14,6 @@
       </md-app-drawer>
 
       <md-app-content>
-        <div v-if="transcripts.length > 0">
-          <md-card v-for="transcript in transcripts" :key="transcript.PSU_ID">
-            <router-link :to="{ name: 'TranscriptViewer', params: {id: transcript.PSU_ID}}">
-              <md-card-content>
-                <p>{{transcript.PSU_ID}}</p>
-                <p>{{transcript.TIMESTAMP}}</p>
-              </md-card-content>
-            </router-link>
-          </md-card>
-        </div>
         <div v-if="transcripts.length === 0 && !isLoading">
           <md-empty-state
             md-icon="image_search"
