@@ -20,7 +20,7 @@
       <md-table-row slot="md-table-row" slot-scope="{ item }">
         <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
         <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-        <md-table-cell md-label="Email" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>
+        <md-table-cell md-label="PSU ID" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>
         <md-table-cell md-label="Campus" md-sort-by="campus">{{ item.campus }}</md-table-cell>
         <md-table-cell md-label="Residency" md-sort-by="residency">{{ item.residency }}</md-table-cell>
       </md-table-row>
@@ -64,21 +64,21 @@
         {
           id: 3,
           name: "Vera Taleworth",
-          email: "vtt7456",
+          psuId: "vtt7456",
           campus: "Altoona",
           residency: "PA"
         },
         {
           id: 4,
           name: "Lonnie Izkovitz",
-          email: "liz9822",
+          psuId: "liz9822",
           campus: "Berks",
           residency: "CO"
         },
         {
           id: 5,
           name: "Thatcher Stave",
-          email: "tst5667",
+          psuId: "tst5667",
           campus: "University Park",
           residency: "PA"
         },
@@ -86,7 +86,7 @@
     }),
     methods: {
       newUser () {
-        window.alert('Noop')
+        window.alert('Alert New User')
       },
       searchOnTable () {
         this.searched = searchByName(this.users, this.search)
