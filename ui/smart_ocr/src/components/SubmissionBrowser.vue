@@ -32,6 +32,7 @@
             <md-button class="md-primary md-raised">Click Me!</md-button>
           </md-empty-state>
         </div>
+        <SubmissionDatatable />
       </md-app-content>
     </md-app>
   </div>
@@ -44,7 +45,7 @@ import get from '@/get';
 export default {
   name: 'SubmissionBrowser',
   components: {AppNavDrawer,SubmissionDatatable},
-  
+
   data () {
     return {
       menuVisible: false,

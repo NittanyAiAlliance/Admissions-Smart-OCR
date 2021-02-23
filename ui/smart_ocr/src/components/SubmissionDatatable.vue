@@ -98,7 +98,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
   .md-field {
     max-width: 300px;
   }
