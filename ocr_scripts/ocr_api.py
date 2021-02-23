@@ -44,6 +44,27 @@ def process_transcript():
     return result_str
 
 """
+@api {post} /api/train Upload File for training output to log
+@apiName GetTrainingText
+
+@apiParam {String} file Base64 Encoded transcript file
+"""
+@api.route('/api/train', methods=['POST'])
+def print_transcript():
+
+    api.logger.info('Received training log POST call')
+
+    # Decode request image to base 64
+    img_str = request.get_json()['file']
+    img_str = base64.b64decode(img_str)
+
+    table_csv = get_table_csv_results(bytearray(img_str))
+
+    # Return response
+    return get_train_text(table_csv)
+
+
+"""
 @api {get} /api Check OCR API Status
 @apiName GetStatus
 
@@ -52,6 +73,16 @@ def process_transcript():
 @api.route('/api/', methods=['GET'])
 def get_status():
     return "Smart OCR is running"
+
+
+def get_train_text(csv_data):
+    out = ''
+    for ind, line in enumerate(csv_data.split('\n')):
+        text = ''.join(line).replace('"', '').replace(',', '').rstrip('\n')
+        if len(text) > 0:
+            out = out + text + '\n'
+    return out
+
 
 def get_table_csv_results(bytes_test):
 
