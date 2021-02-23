@@ -26,8 +26,10 @@ while 1==1:
     elif(text == "dump()"):
         print(json.dumps(TRAIN_DATA))
     elif(text == "edit()"):
+        ind = 0
         for entry, index in TRAIN_DATA:
-            print(str(index) + ": " + str(entry))
+            print(str(ind) + ": " + str(entry) + " : " + str(index))
+            ind += 1
     elif(text == "delete()"):
         index = input("Delete at index: ")
         if index > 0 and index < len(TRAIN_DATA):
