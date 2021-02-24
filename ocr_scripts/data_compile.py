@@ -19,14 +19,17 @@ def compile(batch = 500):
 # Each ent is of format [start, end, value]
 # Returns an array of Doc objects
 def format_docs(data, batch):
+
+    # Create docs return object
     docs = []
     for doc, ents in tqdm(nlp.pipe(data, as_tuples=True, batch_size=batch), total=len(data)):
         this_ents = []
         for ent in ents:
-            this_ent = Span(doc, start=int(ent[0]), end=int(ent[1]), label=str(ent[2]))
+            this_ent = Span(doc, start=int(ent[0]), end=int(ent[1] + 1), label=str(ent[2]))
             this_ents.append(this_ent)
         doc.set_ents(this_ents)
         docs.append(doc)
+
     return docs
 
 # Function to create training and evaluation files from datasets

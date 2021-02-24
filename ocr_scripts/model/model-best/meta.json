@@ -54,17 +54,17 @@
         "f":1.0
       }
     },
+    "dep_uas":0.0,
     "dep_las_per_type":0.0,
     "sents_p":0.0,
     "sents_r":0.0,
     "ents_f":1.0,
     "ents_p":1.0,
     "ents_r":1.0,
-    "dep_uas":0.0,
     "dep_las":0.0,
     "sents_f":0.0,
-    "tok2vec_loss":7154.5139341698,
-    "ner_loss":630.3466098267,
+    "tok2vec_loss":5541.6160085471,
+    "ner_loss":629.8046794931,
     "parser_loss":0.0
   }
 }
