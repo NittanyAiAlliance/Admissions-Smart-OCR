@@ -15,14 +15,15 @@ from pprint import pprint
 import json
 from course_codes_final import course_codes
 
+# select latest spaCy model and configure pipelines and patterns
+nlp = spacy.load(Path(os.getcwd()+'/model/model-last')) 
+ruler = nlp.add_pipe("attribute_ruler")
+patterns = [[{"ORTH": "	"}]]
+attrs = {"TAG": "TAB", "POS": "PUNCT"}
+ruler.add(patterns=patterns, attrs=attrs)
+print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-last'))
+
 def process_ocr(csv_data):
-    # selects an existing model or creates a new model
-    nlp = spacy.load(Path(os.getcwd()+'/model/model-last'))  # load existing spaCy model
-    ruler = nlp.add_pipe("attribute_ruler")
-    patterns = [[{"ORTH": "	"}]]
-    attrs = {"TAG": "TAB", "POS": "PUNCT"}
-    ruler.add(patterns=patterns, attrs=attrs)
-    print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-last'))
 
     lines = {}
     for index, text in enumerate(csv_data.split('\n')):

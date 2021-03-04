@@ -12,7 +12,7 @@ nlp = English()
 def compile(batch = 500):
     fp = "./train_data.npy"
     data = np.load(fp, allow_pickle=True).tolist()
-    create_datafiles(batch, data, data)
+    create_datafiles(batch, data)
 
 # Function to format training/evaluation data into Spacy-readable Docs in binary format
 # Accepts a list of tuples of (text, ents)
@@ -32,12 +32,10 @@ def format_docs(data, batch):
 
     return docs
 
-# Function to create training and evaluation files from datasets
-def create_datafiles(batch, train_data, test_data):
+# Function to create training files from datasets
+def create_datafiles(batch, train_data):
     doc_bin = DocBin(docs=format_docs(train_data, batch))
     doc_bin.to_disk("./train.spacy")
-    doc_bin = DocBin(docs=format_docs(test_data, batch))
-    doc_bin.to_disk("./eval.spacy")
 
 if __name__=="__main__":
     compile()

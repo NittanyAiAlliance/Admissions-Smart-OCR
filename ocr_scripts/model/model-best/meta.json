@@ -21,7 +21,10 @@
     ],
     "ner":[
       "COURSE",
-      "EXTRA"
+      "CREDIT",
+      "EXTRA",
+      "GRADE",
+      "LEVEL"
     ],
     "parser":[
       "ROOT",
@@ -43,7 +46,22 @@
   ],
   "performance":{
     "ents_per_type":{
+      "LEVEL":{
+        "p":1.0,
+        "r":1.0,
+        "f":1.0
+      },
       "COURSE":{
+        "p":1.0,
+        "r":1.0,
+        "f":1.0
+      },
+      "GRADE":{
+        "p":1.0,
+        "r":1.0,
+        "f":1.0
+      },
+      "CREDIT":{
         "p":1.0,
         "r":1.0,
         "f":1.0
@@ -63,8 +81,8 @@
     "ents_r":1.0,
     "dep_las":0.0,
     "sents_f":0.0,
-    "tok2vec_loss":5541.6160085471,
-    "ner_loss":629.8046794931,
+    "tok2vec_loss":10916.6392392016,
+    "ner_loss":1128.7747811841,
     "parser_loss":0.0
   }
 }
