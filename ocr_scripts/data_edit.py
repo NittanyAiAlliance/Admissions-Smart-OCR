@@ -45,10 +45,16 @@ def enter_eval_data(text):
     while token_index < len(doc):
         this_end = int(input("Label from " + str(token_index) + " to : "))
         this_label = input("Label is : ")
-        data_entry[1].append((token_index, this_end, this_label))
+        data_entry[1].append([this_label, doc[token_index:this_end+1].text])
         token_index = this_end + 1
 
-    TRAIN_DATA.append(data_entry)
+    EVAL_DATA.append(data_entry)
+
+# Function to save data
+def save():
+    np.save(tfp, np.asarray(TRAIN_DATA))
+    np.save(efp, np.asarray(EVAL_DATA))
+    print("Saved training & evaluation data.")
 
 # Display op menu
 print("~~~~~~ Smart OCR Data Utility ~~~~~~")
@@ -61,6 +67,7 @@ print("deletet(): delete train data at index")
 print("deletee(): delete eval data at index")
 print("adde(): switch to entering eval data")
 print("addt(): switch to entering training data")
+print("save(): save data")
 
 # Run loop
 while 1==1:
@@ -87,11 +94,11 @@ while 1==1:
             print(str(ind) + ": " + str(entry) + " : " + str(index))
             ind += 1
     elif(text == "deletet()"):
-        index = input("Delete at index: ")
+        index = int(input("Delete at index: "))
         if index > 0 and index < len(TRAIN_DATA):
             TRAIN_DATA.pop(index)
     elif(text == "deletee()"):
-        index = input("Delete at index: ")
+        index = int(input("Delete at index: "))
         if index > 0 and index < len(EVAL_DATA):
             EVAL_DATA.pop(index)
     elif(text == "adde()"):
@@ -100,13 +107,12 @@ while 1==1:
     elif(text == "addt()"):
         mode = 0
         print("Switched to training data")
+    elif(text == "save()"):
+        save()
     else:
         if(mode == 0):
             enter_training_data(text)
         else:
             enter_eval_data(text)
 
-# Save to flat file
-np.save(tfp, np.asarray(TRAIN_DATA))
-np.save(efp, np.asarray(EVAL_DATA))
-print("Saved training & evaluation data. Exiting.")
+save()

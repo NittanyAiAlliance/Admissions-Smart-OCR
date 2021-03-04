@@ -13,7 +13,6 @@ from spacy.util import minibatch, compounding
 from collections import defaultdict
 from pprint import pprint
 import json
-from course_codes_final import course_codes
 
 # select latest spaCy model and configure pipelines and patterns
 nlp = spacy.load(Path(os.getcwd()+'/model/model-last')) 
