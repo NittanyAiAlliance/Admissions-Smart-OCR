@@ -36,6 +36,7 @@ def format_docs(data, batch):
 def create_datafiles(batch, train_data):
     doc_bin = DocBin(docs=format_docs(train_data, batch))
     doc_bin.to_disk("./train.spacy")
+    doc_bin.to_disk("./eval.spacy")
 
 if __name__=="__main__":
     compile()

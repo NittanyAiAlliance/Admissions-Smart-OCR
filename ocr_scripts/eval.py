@@ -10,6 +10,7 @@ EVAL_DATA = np.load(fp, allow_pickle=True).tolist()
 
 # Setup metrics
 totals = {}
+hits = {}
 accuracy = {}
 
 # Function to evaluate model accuracy against evaluation set
@@ -25,20 +26,21 @@ def eval():
             found = False
             for entry in range(1, len(line)): # Iterate returned labels
                 if(line[entry][0] == this_label and line[entry][1] == this_text):
-                    inc_accuracy(this_label)
+                    inc_hits(this_label)
                     found = True
             if(not found):
                 inc_total(this_label)
 
+    calc_accuracy()
     print_dicts()
     plot_eval()
 
-# Function to increment accuracy
-def inc_accuracy(lbl):
-    if lbl in accuracy.keys():
-        accuracy[lbl] = accuracy[lbl] + 1
+# Function to increment hits
+def inc_hits(lbl):
+    if lbl in hits.keys():
+        hits[lbl] = hits[lbl] + 1
     else:
-        accuracy[lbl] = 1
+        hits[lbl] = 1
     inc_total(lbl)
 
 # Function to increment total
@@ -50,22 +52,29 @@ def inc_total(lbl):
 
 # Function to plot accuracies to bar chart
 def plot_eval():
-    plt.bar(*zip(*totals.items()))
+    plt.bar(*zip(*accuracy.items()))
     plt.ylabel('Accuracy')
     plt.title('OCR Evaluation')
     plt.show(block=True)
 
+# Function to calculate accuracies
+def calc_accuracy():
+    for lbl in hits.keys():
+        accuracy[lbl] = hits[lbl] / totals[lbl]
+    accuracy["EFFECTIVE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"]) / 4
+    accuracy["AGGREGATE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"] + accuracy["EXTRA"]) / 5
+
 # Function to print dictionaries
 def print_dicts():
     print("~~~~~Hits~~~~~")
-    for lbl in accuracy.keys():
-        print(str(lbl) + " : " + str(accuracy[lbl]))
+    for lbl in hits.keys():
+        print(str(lbl) + " : " + str(hits[lbl]))
     print("~~~~~Totals~~~~~")
     for tot in totals.keys():
         print(str(tot) + " : " + str(totals[tot]))
     print("~~~~~Accuracies~~~~~")
     for lbl in accuracy.keys():
-        print(str(lbl) + " : " + str((accuracy[lbl] / totals[lbl])))
+        print(str(lbl) + " : " + str(accuracy[lbl]))
 
 if __name__ == "__main__":
     eval()
