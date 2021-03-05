@@ -97,6 +97,9 @@ while 1==1:
         index = int(input("Delete at index: "))
         if index > 0 and index < len(TRAIN_DATA):
             TRAIN_DATA.pop(index)
+    elif(text == "ext()"):
+        for data in TRAIN_DATA:
+            data[1] = [label for label in data[1] if not label[2]=="EXTRA"]
     elif(text == "deletee()"):
         index = int(input("Delete at index: "))
         if index > 0 and index < len(EVAL_DATA):
