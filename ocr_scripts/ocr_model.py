@@ -28,11 +28,12 @@ def process_ocr(csv_data):
     for index, text in enumerate(csv_data.split('\n')):
         text = ''.join(text).replace('"', '').replace(',', '').rstrip('\n')
         if len(text) > 0:
-            doc = nlp(text)
-            this_course = [doc.text]
-            for ent in doc.ents:
-                this_ent = (ent.label_, ent.text)
-                this_course.append(this_ent)
-            lines["Line " + str(index)] = this_course
+            if(text.find("Table:") < 0):
+                doc = nlp(text)
+                this_course = [doc.text]
+                for ent in doc.ents:
+                    this_ent = (ent.label_, ent.text)
+                    this_course.append(this_ent)
+                lines["Line " + str(index)] = this_course
         
     return lines
