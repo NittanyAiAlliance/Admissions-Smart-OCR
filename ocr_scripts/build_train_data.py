@@ -24,7 +24,7 @@ def is_valid(row):
         return False
     if(not str(row['course_title']).isprintable()):
         return False
-    if(not str(row['course_academic_grade']).isalpha()):
+    if(not str(row['course_academic_grade']).isalpha()): # TODO replace this script
         return False
     if(not len(str(row['course_academic_grade']).strip()) > 0):
         return False
@@ -44,7 +44,7 @@ with open ("srar.csv", "r") as file:
     print("Loaded training and SRAR data - compiling training set.")
 
     # Iterate pandas dataframe
-    for index, row in tqdm(list(df.iterrows())[0:100000], total=100000):
+    for index, row in tqdm(df.iterrows()):
 
         # Check for valid entries
         if(is_valid(row)):

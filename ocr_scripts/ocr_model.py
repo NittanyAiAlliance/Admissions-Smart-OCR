@@ -24,12 +24,12 @@ print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-last'))
 
 # Preprocess with some blanket functions to improve noise reduction accuracy
 def preprocess_ocr(text):
-    if(text.isalpha()):
+    if(text.replace(' ', '').isalpha()):
         return ''
     if(text.find('GPA') >= 0):
         return ''
-    text = text.replace('(', '')
-    text = text.replace(')', '')
+    text = text.replace('(', '') #This improves extra lowers course and level
+    text = text.replace(')', '') #This improves extra lowers course and level
     return text
 
 # Process CSV data through OCR model
