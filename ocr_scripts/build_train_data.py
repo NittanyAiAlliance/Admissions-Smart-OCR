@@ -9,13 +9,28 @@ from tqdm.auto import tqdm
 
 # Function to find course level in token sen
 def find_level(doc, level):
-    synms = {'H': ['HON', 'HONORS', 'HNRS', 'HON.'], 'PBIB': ['IB']}
+    synms = {'H': ['HON', 'HONORS', 'HNRS', 'HON.', 'HN'], 'PBIB': ['IB']}
     for token in doc:
         if(token.text.upper() == level):
             return token.i
-        if(token.text.upper() in synms[level]):
-            return token.i
+        if(level in synms.keys()):
+            if(token.text.upper() in synms[level]):
+                return token.i
     return -1
+
+# Function to return if a row is invalid
+def is_valid(row):
+    if(not len(str(row['course_title']).strip()) > 0):
+        return False
+    if(not str(row['course_title']).isprintable()):
+        return False
+    if(not str(row['course_academic_grade']).isalpha()):
+        return False
+    if(not len(str(row['course_academic_grade']).strip()) > 0):
+        return False
+    if(not len(str(row['course_credit_value']).strip()) > 0):
+        return False
+    return True
 
 # Load training data numpy
 tfp = "./train_data.npy"
@@ -29,52 +44,60 @@ with open ("srar.csv", "r") as file:
     print("Loaded training and SRAR data - compiling training set.")
 
     # Iterate pandas dataframe
-    for index, row in tqdm(df.iterrows()):
+    for index, row in tqdm(list(df.iterrows())[0:100000], total=100000):
 
-        data_entry = (text, [])
-        gradeToken = 1
+        # Check for valid entries
+        if(is_valid(row)):
 
-        # Create courseline text
-        text = str(row['course_title']) + ' ' + str(row['course_academic_grade']) + ' ' + str(row['course_credit_value'])
+            # Randomize credit length
+            credit = str(row['course_credit_value'])
+            for i in range(random.randint(0, 5)):
+                credit = credit + '0'
 
-        # Parse ocr tokens
-        doc = nlp(text)
+            # Create courseline text
+            course = ' '.join(str(row['course_title']).strip().split())
+            text = course + ' ' + str(row['course_academic_grade']).strip() + ' ' + credit.strip()
+            
+            data_entry = (text, [])
+            gradeToken = 1
 
-        # Detect and create grade, credit spans
-        for token in doc:
-            if(token.text == row['course_academic_grade']):
-                gradeToken = token.i
-                data_entry[1].append((token.i, token.i, 'GRADE'))
-            if(token.text == row['course_credit_value']):
-                data_entry[1].append((token.i, token.i, 'CREDIT'))
+            # Parse ocr tokens
+            doc = nlp(text)
 
-        # Handle regular courses
-        if(str(row['course_level']) == 'RG'):
-            data_entry[1].append((0, gradeToken - 1, 'COURSE'))
+            # Detect and create grade, credit spans
+            gradeToken = len(doc) - 2
+            data_entry[1].append((gradeToken, gradeToken, 'GRADE'))
+            data_entry[1].append((len(doc) - 1, len(doc) - 1, 'CREDIT'))
 
-        # Handle course levels
-        else:
+            # Handle regular courses
+            if(str(row['course_level']) == 'RG'):
+                data_entry[1].append((0, gradeToken - 1, 'COURSE'))
 
-            # Find index of level token
-            levelToken = find_level(doc, row['course_level'])
-
-            if(levelToken >= 0):
-
-                # Tag level token
-                data_entry[1].append((levelToken, levelToken, 'LEVEL'))
-
-                # Tag up to level token
-                if(levelToken > 0):
-                    data_entry[1].append((0, levelToken - 1, 'COURSE'))
-
-                # Tag after level token
-                if(gradeToken - levelToken > 1):
-                    data_entry[1].append((levelToken + 1, gradeToken - 1, 'COURSE'))
-
-            # Handle no level token
+            # Handle course levels
             else:
-                data_entry[1].append((0, gradeToken - 1, 'COURSE')) 
 
-        # Add to training set
-        TRAIN_DATA.append(data_entry)
-    
+                # Find index of level token
+                levelToken = find_level(doc, row['course_level'])
+
+                if(levelToken >= 0):
+
+                    # Tag level token
+                    data_entry[1].append((levelToken, levelToken, 'LEVEL'))
+
+                    # Tag up to level token
+                    if(levelToken > 0):
+                        data_entry[1].append((0, levelToken - 1, 'COURSE'))
+
+                    # Tag after level token
+                    if(gradeToken - levelToken > 1):
+                        data_entry[1].append((levelToken + 1, gradeToken - 1, 'COURSE'))
+
+                # Handle no level token
+                else:
+                    data_entry[1].append((0, gradeToken - 1, 'COURSE')) 
+
+            # Add to training set
+            TRAIN_DATA.append(data_entry)
+
+np.save(tfp, np.asarray(TRAIN_DATA))
+print('Finished generating training data.')

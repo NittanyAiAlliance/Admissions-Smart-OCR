@@ -9,27 +9,41 @@ fp = "./eval_data.npy"
 EVAL_DATA = np.load(fp, allow_pickle=True).tolist()
 
 # Setup metrics
-totals = {}
-hits = {}
-accuracy = {}
+totals = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
+hits = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
+accuracy = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 
 # Function to evaluate model accuracy against evaluation set
 def eval():
 
     # Iterate and process
     for data in tqdm(EVAL_DATA):
-        line = process_ocr(data[0])["Line 0"] # Run OCR on text
-        exp = data[1] # Save expected array of label pairs
-        for label in exp:
-            this_label = label[0]
-            this_text = label[1]
-            found = False
-            for entry in range(1, len(line)): # Iterate returned labels
-                if(line[entry][0] == this_label and line[entry][1] == this_text):
-                    inc_hits(this_label)
-                    found = True
-            if(not found):
-                inc_total(this_label)
+        line = process_ocr(data[0]) # Run OCR on text
+        if(len(line) > 0):
+            line = line["Line 0"]
+            exp = data[1] # Save expected array of label pairs
+            for label in exp:
+                this_label = label[0]
+                this_text = label[1]
+                # Handle aggregate accuracy
+                if(this_label != 'EXTRA'):
+                    hit = False
+                    for entry in range(1, len(line)): # Iterate returned labels
+                        if(line[entry][0] == this_label and line[entry][1] == this_text): # Return hit on exact match
+                            inc_hits(this_label)
+                            hit = True
+                    if(not hit):
+                        inc_total(this_label)
+                # Handle effective accuracy
+                else:
+                    misfire = False
+                    for entry in range(1, len(line)): # Iterate returned labels
+                        if(this_text in line[entry][1]):
+                            if(line[entry][0] != 'EXTRA'):
+                                inc_total(this_label)
+                                misfire = True
+                    if(not misfire):
+                        inc_hits('EXTRA')
 
     calc_accuracy()
     print_dicts()

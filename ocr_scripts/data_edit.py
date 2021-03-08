@@ -65,6 +65,8 @@ print("showt(): show training data with index")
 print("showe(): show eval data with index")
 print("deletet(): delete train data at index")
 print("deletee(): delete eval data at index")
+print("findempty(): print lines that may cause model errors")
+print("cutt(): cut training data to range")
 print("adde(): switch to entering eval data")
 print("addt(): switch to entering training data")
 print("save(): save data")
@@ -84,19 +86,31 @@ while 1==1:
     elif(text == "dumpe()"):
         print(json.dumps(EVAL_DATA))
     elif(text == "showt()"):
+        print("Training has " + str(len(TRAIN_DATA)) + " lines.")
+        start_print = int(input("Enter index to print 100 lines from: "))
         ind = 0
-        for entry, index in TRAIN_DATA:
-            print(str(ind) + ": " + str(entry) + " : " + str(index))
+        for entry in TRAIN_DATA[start_print:start_print+100]:
+            print(str(ind) + ": " + str(entry) + " : ")
+            ind += 1
+    elif(text == "findempty()"):
+        ind = 0
+        for entry in TRAIN_DATA:
+            if(str(entry).isspace() or len(str(entry)) < 2 or str(entry).find('  ') >= 0):
+                print(str(ind) + ": " + str(entry) + " : ")
             ind += 1
     elif(text == "showe()"):
         ind = 0
-        for entry, index in EVAL_DATA:
-            print(str(ind) + ": " + str(entry) + " : " + str(index))
+        for entry in EVAL_DATA:
+            print(str(ind) + ": " + str(entry) + " : ")
             ind += 1
     elif(text == "deletet()"):
         index = int(input("Delete at index: "))
         if index > 0 and index < len(TRAIN_DATA):
             TRAIN_DATA.pop(index)
+    elif(text == "cutt()"):
+        cuts = int(input("Chop new from index: "))
+        cute = int(input("Chop new to index: "))
+        TRAIN_DATA = TRAIN_DATA[cuts:cute+1]
     elif(text == "ext()"):
         for data in TRAIN_DATA:
             data[1] = [label for label in data[1] if not label[2]=="EXTRA"]
