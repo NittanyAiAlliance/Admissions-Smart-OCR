@@ -17,7 +17,6 @@ proximity = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 
 # Function to find similarity between two strings
 def similar(a, b):
-    print(a + ' is ' + str(SequenceMatcher(None, a, b).ratio()) + ' similar to ' + b)
     return SequenceMatcher(None, a, b).ratio()
 
 # Function to evaluate model accuracy against evaluation set
@@ -93,7 +92,7 @@ def add_prox(lbl, value):
 
 # Function to plot accuracies to bar chart
 def plot_eval():
-    plt.bar(*zip(*accuracy.items()))
+    plt.bar(list(accuracy.keys()) + [x + " Prox" for x in list(proximity.keys())], list(accuracy.values()) + list(proximity.values()))
     plt.ylabel('Accuracy')
     plt.title('OCR Evaluation')
     plt.show(block=True)

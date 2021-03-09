@@ -15,12 +15,12 @@ from pprint import pprint
 import json
 
 # select latest spaCy model and configure pipelines and patterns
-nlp = spacy.load(Path(os.getcwd()+'/model/model-last')) 
+nlp = spacy.load(Path(os.getcwd()+'/model/model-big')) 
 ruler = nlp.add_pipe("attribute_ruler")
 patterns = [[{"ORTH": "	"}]]
 attrs = {"TAG": "TAB", "POS": "PUNCT"}
 ruler.add(patterns=patterns, attrs=attrs)
-print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-last'))
+print("Loaded model '%s'" % Path(os.getcwd()+'/model/model-big'))
 
 # Preprocess with some blanket functions to improve noise reduction accuracy
 def preprocess_ocr(text):

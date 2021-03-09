@@ -18,13 +18,19 @@ def find_level(doc, level):
                 return token.i
     return -1
 
+# Function to return whether a grade is predictably valid
+def is_valid_grade(text):
+    if(re.fullmatch(r'([A-Z][A-Z])|([A-Z]\+)|([A-Z]-)|([A-Z])|([0-2][0-9][0-9])|([0-9][0-9])|([0-9])', text) == None):
+        return False
+    return True
+
 # Function to return if a row is invalid
 def is_valid(row):
     if(not len(str(row['course_title']).strip()) > 0):
         return False
     if(not str(row['course_title']).isprintable()):
         return False
-    if(not str(row['course_academic_grade']).isalpha()): # TODO replace this script
+    if(not is_valid_grade(str(row['course_academic_grade']))):
         return False
     if(not len(str(row['course_academic_grade']).strip()) > 0):
         return False
