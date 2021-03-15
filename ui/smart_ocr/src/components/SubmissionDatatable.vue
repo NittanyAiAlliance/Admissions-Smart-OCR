@@ -5,10 +5,23 @@
         <div class="md-toolbar-section-start">
           <h1 class="md-title">Users</h1>
         </div>
+        <div class="md-toolbar-section-start">
+          <md-field md-clearable class="md-toolbar-section-start">
+            <md-input placeholder="Name..." v-model="search" @input="searchNameOnTable" />
+          </md-field> 
 
-        <md-field md-clearable class="md-toolbar-section-end">
-          <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
-        </md-field>
+          <md-field md-clearable class="md-toolbar-section-start">
+            <md-input placeholder="PSU ID..." v-model="search" @input="searchPSUIdOnTable"/>
+          </md-field>
+
+          <md-field md-clearable class="md-toolbar-section-start">
+            <md-input placeholder="Campus..." v-model="search" @input="searchCampusOnTable"/>
+          </md-field>
+
+          <md-field md-clearable class="md-toolbar-section-start">
+            <md-input placeholder="Residency..." v-model="search" @input="searchResidencyOnTable"/>
+          </md-field>
+        </div>
       </md-table-toolbar>
 
       <md-table-empty-state
@@ -40,7 +53,25 @@
 
     return items
   }
+  const searchByPSUId = (items,term) => {
+    if (term) {
+      return items.filter(item => toLower(item.psuId).includes(toLower(term)))
+    }
+    return items
+  }
 
+  const searchByCampus = (items,term) => {
+    if (term) {
+      return items.filter(item => toLower(item.campus).includes(toLower(term)))
+    }
+    return items
+  }
+  const searchByResidency = (items,term) => {
+    if (term) {
+      return items.filter(item => toLower(item.residency).includes(toLower(term)))
+    }
+    return items
+  }
   export default {
     name: 'SubmissionDatatable',
     data: () => ({
@@ -88,9 +119,19 @@
       newUser () {
         window.alert('Alert New User')
       },
-      searchOnTable () {
+      searchNameOnTable () {
         this.searched = searchByName(this.users, this.search)
+      },
+      searchPSUIdOnTable (){
+        this.searched = searchByPSUId(this.users,this.search)
+      },
+      searchCampusOnTable (){
+        this.searched = searchByCampus(this.users,this.search)
+      },
+      searchResidencyOnTable (){
+        this.searched = searchByResidency(this.users,this.search)
       }
+
     },
     created () {
       this.searched = this.users
