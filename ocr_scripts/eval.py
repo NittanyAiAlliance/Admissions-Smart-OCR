@@ -14,6 +14,7 @@ totals = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 hits = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 accuracy = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 proximity = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
+synopsis = 0
 
 # Function to find similarity between two strings
 def similar(a, b):
@@ -92,17 +93,19 @@ def add_prox(lbl, value):
 
 # Function to plot accuracies to bar chart
 def plot_eval():
-    plt.bar(list(accuracy.keys()) + [x + " Prox" for x in list(proximity.keys())], list(accuracy.values()) + list(proximity.values()))
+    plt.bar(list(accuracy.keys()) + [x + " Prox" for x in list(proximity.keys())] + ['Synopsis'], list(accuracy.values()) + list(proximity.values()) + [synopsis])
     plt.ylabel('Accuracy')
     plt.title('OCR Evaluation')
     plt.show(block=True)
 
 # Function to calculate accuracies
 def calc_accuracy():
+    global synopsis
     for lbl in hits.keys():
         accuracy[lbl] = hits[lbl] / totals[lbl]
     accuracy["EFFECTIVE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"]) / 4
     accuracy["AGGREGATE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"] + accuracy["EXTRA"]) / 5
+    synopsis = (accuracy["GRADE"] + accuracy["CREDIT"] + accuracy["LEVEL"] + proximity["COURSE"]) / 4
 
 # Function to print dictionaries
 def print_dicts():
@@ -118,6 +121,8 @@ def print_dicts():
     print("~~~~~Proximities~~~~~")
     for lbl in proximity.keys():
         print(str(lbl) + " : " + str(proximity[lbl]))
+    print("~~~~~Synopsis~~~~~")
+    print("Effective Synopsis : " + str(synopsis))
 
 if __name__ == "__main__":
     eval()
