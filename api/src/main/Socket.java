@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *      Handles standardized synthetic handshake
  * @author Joel Seidel
  */
-public class SocketPrototype extends WebSocketServer {
+public class Socket extends WebSocketServer {
 
     //WebSocket endpoint handlers map
     private Map<String, Endpoint> endpoints;
@@ -57,7 +57,7 @@ public class SocketPrototype extends WebSocketServer {
      * @param socketName name of the socket
      * @param endpoints map of endpoint names to endpoint objects for this socket
      */
-    public SocketPrototype(int port, String socketName, Map<String, Endpoint> endpoints) {
+    public Socket(int port, String socketName, Map<String, Endpoint> endpoints) {
         //Create the WebSocket server instance at the specified port
         super(new InetSocketAddress(port));
         //Initialize the client state collections

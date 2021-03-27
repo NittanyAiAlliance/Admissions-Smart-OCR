@@ -31,7 +31,8 @@
 <script>
 import AppNavDrawer from './AppNavDrawer'
 import SubmissionDatatable from './SubmissionDatatable'
-import get from '@/get';
+import get from '@/get'
+import client from "@/client"
 export default {
   name: 'SubmissionBrowser',
   components: {AppNavDrawer,SubmissionDatatable},
@@ -40,13 +41,19 @@ export default {
     return {
       menuVisible: false,
       isLoading: true,
-      transcripts: []
+      transcripts: [],
+      wsConn: null
     }
   },
   created() {
+    // Fetch the enqueued transcripts from the SmartOCR API
     get.getTranscriptQueue().then(transcripts =>{
-      this.isLoading = false;
-      this.transcripts = transcripts.data.queue;
+      // Toggle loading - done loading if this far
+      this.isLoading = false
+      //Set the transcripts to the DOM
+      this.transcripts = transcripts.data.queue
+      //Initiate the real-time content now that we have a set queue
+      this.wsConn = new client();
     });
   }
 }
