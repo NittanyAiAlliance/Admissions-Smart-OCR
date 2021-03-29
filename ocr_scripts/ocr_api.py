@@ -11,6 +11,7 @@ import plac
 import random
 import logging
 from ocr_model import process_ocr
+from stars import process_stars
 
 api = Flask(__name__)
 
@@ -39,6 +40,9 @@ def process_transcript():
 
     # Process OCR on resulting CSV
     result_str = process_ocr(table_csv)
+
+    # Process COURSE into STARS
+    result_str = process_stars(result_str)
     
     # Return response
     return result_str
@@ -74,7 +78,7 @@ def print_transcript():
 def get_status():
     return "Smart OCR is running"
 
-
+# Function to get CSV and textract processed transcript text
 def get_train_text(csv_data):
     out = ''
     for ind, line in enumerate(csv_data.split('\n')):
@@ -83,7 +87,7 @@ def get_train_text(csv_data):
             out = out + text + '\n'
     return out
 
-
+# Function to perform textract and CSV processing
 def get_table_csv_results(bytes_test):
 
     # Connect to AWS Textract via boto3
@@ -113,6 +117,7 @@ def get_table_csv_results(bytes_test):
     return csv
 
 
+# Function to generate CSV table from map
 def generate_table_csv(table_result, blocks_map, table_index):
     rows = get_rows_columns_map(table_result, blocks_map)
 
@@ -130,6 +135,7 @@ def generate_table_csv(table_result, blocks_map, table_index):
     csv += '\n\n\n'
     return csv
 
+# Function to detect rows and columns from textract table
 def get_rows_columns_map(table_result, blocks_map):
     rows = {}
     for relationship in table_result['Relationships']:
@@ -147,6 +153,7 @@ def get_rows_columns_map(table_result, blocks_map):
                     rows[row_index][col_index] = get_text(cell, blocks_map)
     return rows
 
+# Function to get text from textract block
 def get_text(result, blocks_map):
     text = ''
     if 'Relationships' in result:
