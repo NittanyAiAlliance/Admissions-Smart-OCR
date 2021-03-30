@@ -45,6 +45,5 @@ def process_stars(data):
 # Function to find subject and course code given STARS generic course name
 def find_code(title):
     for index, row in df.iterrows():
-        print(str(index) + ": " + str(row))
         if(str(row[course_col]) == str(title)):
             return (str(row[subject_col]), str(row[code_col]))

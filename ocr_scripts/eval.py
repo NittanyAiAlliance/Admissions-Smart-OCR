@@ -35,7 +35,7 @@ def eval():
             this_label = label[0]
             this_text = label[1]
             # Handle aggregate accuracy
-            if(this_label != 'EXTRA'):
+            if(this_label != 'EXTRA' and this_label != 'COURSE_SUBJECT' and this_label != 'COURSE_NAME' and this_label != 'COURSE_CODE'):
                 hit = False
                 for entry in range(1, len(line)): # Iterate returned labels
                     if(line[entry][0] == this_label and line[entry][1] == this_text): # Return hit on exact match
@@ -53,7 +53,7 @@ def eval():
                 if(not hit):
                     inc_total(this_label)
             # Handle effective accuracy
-            else:
+            elif(this_label == 'EXTRA'):
                 misfire = False
                 for entry in range(1, len(line)): # Iterate returned labels
                     if(this_text in line[entry][1]):
@@ -102,6 +102,7 @@ def plot_eval():
 def calc_accuracy():
     global synopsis
     for lbl in hits.keys():
+        print("Loading " + str(lbl))
         accuracy[lbl] = hits[lbl] / totals[lbl]
     accuracy["EFFECTIVE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"]) / 4
     accuracy["AGGREGATE"] = (accuracy["GRADE"] + accuracy["COURSE"] + accuracy["CREDIT"] + accuracy["LEVEL"] + accuracy["EXTRA"]) / 5

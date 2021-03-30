@@ -50,6 +50,23 @@ def enter_eval_data(text):
 
     EVAL_DATA.append(data_entry)
 
+# Function to enter course codes for eval set
+def enter_course_codes():
+    index = 0
+    for entry in EVAL_DATA:
+        tagged = False
+        for label in entry[1]:
+            if(label[0] == 'COURSE_CODE'):
+                tagged = True
+                break
+        if not tagged:
+            this_code = input(str(entry[0]) + ": ")
+            if(this_code == "stop()"):
+                return
+            else:
+                EVAL_DATA[index][1].append(["COURSE_CODE", this_code.strip()])
+        index += 1
+
 # Function to save data
 def save():
     np.save(tfp, np.asarray(TRAIN_DATA))
@@ -69,6 +86,7 @@ print("findempty(): print lines that may cause model errors")
 print("cutt(): cut training data to range")
 print("adde(): switch to entering eval data")
 print("addt(): switch to entering training data")
+print("addcodes(): add course codes to eval data")
 print("save(): save data")
 
 # Run loop
@@ -126,6 +144,8 @@ while 1==1:
         print("Switched to training data")
     elif(text == "save()"):
         save()
+    elif(text == "addcodes()"):
+        enter_course_codes()
     else:
         if(mode == 0):
             enter_training_data(text)
