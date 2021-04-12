@@ -4,15 +4,16 @@ from tqdm.auto import tqdm
 import matplotlib
 import matplotlib.pyplot as plt
 from difflib import SequenceMatcher
+from stars import process_stars
 
 # Load data
 fp = "./eval_data.npy"
 EVAL_DATA = np.load(fp, allow_pickle=True).tolist()
 
 # Setup metrics
-totals = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
-hits = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
-accuracy = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
+totals = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0, "COURSE_CODE": 0}
+hits = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0, "COURSE_CODE": 0}
+accuracy = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0, "COURSE_CODE": 0}
 proximity = {"GRADE": 0, "COURSE": 0, "LEVEL":0, "CREDIT":0, "EXTRA": 0}
 synopsis = 0
 
@@ -25,7 +26,7 @@ def eval():
 
     # Iterate and process
     for data in tqdm(EVAL_DATA):
-        line = process_ocr(data[0]) # Run OCR on text
+        line = process_stars(process_ocr(data[0])) # Run OCR on text
         if(len(line) > 0):
             line = line["Line 0"]
         else:
@@ -35,7 +36,7 @@ def eval():
             this_label = label[0]
             this_text = label[1]
             # Handle aggregate accuracy
-            if(this_label != 'EXTRA' and this_label != 'COURSE_SUBJECT' and this_label != 'COURSE_NAME' and this_label != 'COURSE_CODE'):
+            if(this_label != 'EXTRA' and this_label != 'COURSE_SUBJECT' and this_label != 'COURSE_NAME'):
                 hit = False
                 for entry in range(1, len(line)): # Iterate returned labels
                     if(line[entry][0] == this_label and line[entry][1] == this_text): # Return hit on exact match

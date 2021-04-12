@@ -58,7 +58,7 @@ def process_ocr(csv_data):
                 if(levelToken >= 0):
                     level_ent = ("LEVEL", doce[levelToken].text)
                     this_course.append(level_ent)
-                    process_text = doce[0:levelToken].text + doce[levelToken+1:].text
+                    process_text = doce[0:levelToken].text + ' ' + doce[levelToken+1:].text
                 else:
                     process_text = text
                 doc = nlp(process_text)
