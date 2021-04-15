@@ -82,3 +82,4 @@ Admissions-Smart-OCR.iml
 .idea/modules.xml
 .idea/misc.xml
 .idea/libraries/lib.xml
+test/**
