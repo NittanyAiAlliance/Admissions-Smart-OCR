@@ -5,6 +5,16 @@
         <div class="md-toolbar-section-start">
           <h1 class="md-title">Users</h1>
         </div>
+        <!--Make a div that when input= "searchCampusOnTable" and another div input="searchResidencyOnTable" 
+        count the amount for each of the things listed 
+        <div class="md-toolbar-section-end">
+          <md-field md-clearable class="md-toolbar-section-start">
+            
+            <p>{{ countCampusOnTable() }} results found</p>
+            <p>{{ countResidencyOnTable() }} results found</p>
+          </md-field> 
+        </div> -->
+
         <div class="md-toolbar-section-start">
           <md-field md-clearable class="md-toolbar-section-start">
             <md-input placeholder="Name..." v-model="search" @input="searchNameOnTable" />
@@ -130,9 +140,20 @@
       },
       searchResidencyOnTable (){
         this.searched = searchByResidency(this.users,this.search)
+      },
+
+      //Create function for counting the amount for searchCampusOnTable
+      countCampusOnTable(){
+        return this.searchCampusOnTable.length
+      },
+      //Create function for counting the amount for searchResidencyOnTable
+      countResidencyOnTable(){
+        return this.searchResidencyOnTable.length
+
       }
 
     },
+
     created () {
       this.searched = this.users
     }

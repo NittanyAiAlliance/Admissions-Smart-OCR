@@ -4,7 +4,7 @@ import SubmissionBrowser from '@/components/SubmissionBrowser'
 import SearchTranscripts from '@/components/SearchTranscripts'
 import Dashboard from '@/components/Dashboard'
 import TranscriptViewer from '@/components/TranscriptViewer';
-
+import LogBrowser from '@/components/LogBrowser';
 Vue.use(Router)
 
 export default new Router({
@@ -28,6 +28,11 @@ export default new Router({
       path: '/transcript',
       name: 'TranscriptViewer',
       component: TranscriptViewer
+    },
+    {
+      path:'/history',
+      name:'LogBrowser',
+      component: LogBrowser
     }
   ]
 })

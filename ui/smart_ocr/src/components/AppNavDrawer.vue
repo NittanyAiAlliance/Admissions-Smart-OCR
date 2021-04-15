@@ -8,7 +8,7 @@
       <md-icon class="nav-icon">queue</md-icon>
       <span class="md-list-item-text">Transcript Queue</span>
     </md-list-item>
-    <md-list-item to="/">
+    <md-list-item to="/history">
       <md-icon class="nav-icon">history</md-icon>
       <span class="md-list-item-text">Transcript History</span>
     </md-list-item>
