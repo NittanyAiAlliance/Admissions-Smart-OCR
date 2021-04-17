@@ -17,12 +17,15 @@
         <md-button class="md-primary md-raised" @click="newUser">Create New User</md-button>
       </md-table-empty-state>
 
-      <md-table-row slot="md-table-row" slot-scope="{ item }" @click.native="openTranscript(item)">
-          <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
-          <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-          <md-table-cell md-label="Email" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>
-          <md-table-cell md-label="Campus" md-sort-by="campus">{{ item.campus }}</md-table-cell>
-          <md-table-cell md-label="Residency" md-sort-by="residency">{{ item.residency }}</md-table-cell>
+      <md-table-row slot="md-table-row" slot-scope="{ item }" @click.native="openTranscript(item)" v-bind:class="{'checked-out': item.CHECKED_OUT}">
+          <md-table-cell md-label="Time" md-sort-by="TIMESTAMP" md-numeric>{{ item.TIMESTAMP }}</md-table-cell>
+          <md-table-cell md-label="First" md-sort-by="FIRST_NAME">{{ item.FIRST_NAME }}</md-table-cell>
+          <md-table-cell md-label="Middle" md-sort-by="MIDDLE_NAME">{{ item.MIDDLE_NAME }}</md-table-cell>
+          <md-table-cell md-label="Last" md-sort-by="LAST_NAME">{{ item.LAST_NAME }}</md-table-cell>
+          <md-table-cell md-label="PSU ID" md-sort-by="PSU_ID">{{ item.PSU_ID }}</md-table-cell>
+          <md-table-cell md-label="Campus" md-sort-by="CAMPUS">{{ item.CAMPUS }}</md-table-cell>
+          <md-table-cell md-label="Residency" md-sort-by="CITIZENSHIP">{{ item.CITIZENSHIP }}</md-table-cell>
+          <md-table-cell md-label="Checked Out">{{item.CHECKED_OUT}}</md-table-cell>
       </md-table-row>
     </md-table>
   </div>
@@ -43,60 +46,41 @@
 
   export default {
     name: 'SubmissionDatatable',
+    props: {
+      queue: {
+        type: Array,
+        required: true
+      },
+    },
     data: () => ({
       search: null,
-      searched: [],
-      users: [
-        {
-          id: 1,
-          name: "Shawna Dubbin",
-          psuId: "sdd0192",
-          campus: "University Park",
-          residency: "PA"
-        },
-        {
-          id: 2,
-          name: "Odette Demageard",
-          psuId: "odd9485",
-          campus: "University Park",
-          residency: "GA"
-        },
-        {
-          id: 3,
-          name: "Vera Taleworth",
-          psuId: "vtt7456",
-          campus: "Altoona",
-          residency: "PA"
-        },
-        {
-          id: 4,
-          name: "Lonnie Izkovitz",
-          psuId: "liz9822",
-          campus: "Berks",
-          residency: "CO"
-        },
-        {
-          id: 5,
-          name: "Thatcher Stave",
-          psuId: "tst5667",
-          campus: "University Park",
-          residency: "PA"
-        },
-      ]
+      searched: []
     }),
     methods: {
       newUser () {
         window.alert('Not yet implemented')
       },
       searchOnTable () {
-        this.searched = searchByName(this.users, this.search)
+        this.searched = searchByName(this.$props.queue, this.search)
       },
       openTranscript (item) {
-        this.$router.push({ name: 'TranscriptViewer', params: {id: item.psuId}});
+        // Dispatch the check out event with the selected PSU ID
+        this.$store.dispatch('checkOut', item.PSU_ID);
+        // Navigate to the transcript viewer with the transcript object as the payload
+        this.$router.push({ name : 'TranscriptViewer', params: { transcript: item} })
       }
     },
     created () {
-      this.searched = this.users
+      this.searched = this.$props.queue
+    },
+    watch: {
+      queue: {
+        immediate: true,
+        deep: true,
+        handler(val, oldVal){
+          this.searched = val
+        }
+      }
     }
   }
 </script>
@@ -104,5 +88,8 @@
 <style scoped>
   .md-field {
     max-width: 300px;
+  }
+  .checked-out{
+    background-color: red;
   }
 </style>

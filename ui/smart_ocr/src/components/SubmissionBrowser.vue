@@ -22,7 +22,7 @@
             <md-button class="md-primary md-raised">Click Me!</md-button>
           </md-empty-state>
         </div>
-        <SubmissionDatatable />
+        <SubmissionDatatable v-bind:queue="transcripts" />
       </md-app-content>
     </md-app>
   </div>
@@ -39,22 +39,22 @@ export default {
 
   data () {
     return {
-      menuVisible: false,
-      isLoading: true,
-      transcripts: [],
-      wsConn: null
+      menuVisible: false
     }
   },
   created() {
-    // Fetch the enqueued transcripts from the SmartOCR API
-    get.getTranscriptQueue().then(transcripts =>{
-      // Toggle loading - done loading if this far
-      this.isLoading = false
-      //Set the transcripts to the DOM
-      this.transcripts = transcripts.data.queue
-      //Initiate the real-time content now that we have a set queue
-      this.wsConn = new client();
-    });
+    // Dispatch action to fetch transcripts
+    this.$store.dispatch('fetchTranscripts').then(() =>
+      // Dispatch action to create the socket connection
+      this.$store.dispatch('createSocketConnection'));
+  },
+  computed: {
+    transcripts() {
+      return Array.from(this.$store.state.transcripts.values());
+    },
+    isLoading() {
+      return this.$store.state.transcripts.size === 0;
+    }
   }
 }
 </script>
