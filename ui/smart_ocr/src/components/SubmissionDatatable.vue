@@ -7,7 +7,19 @@
         </div>
 
         <md-field md-clearable class="md-toolbar-section-end">
-          <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+          <md-input placeholder="Search" v-model="search" @input="searchOnTable" />
+        </md-field>
+        <md-field md-clearable class="md-toolbar-section-end">
+          <label for="fields">Select Fields to Search</label>
+          <md-select v-model="searchFields" name="fields" id="fields" multiple @input="searchOnTable">
+            <md-option value="TIMESTAMP">Date</md-option>
+            <md-option value="FIRST_NAME">First Name</md-option>
+            <md-option value="MIDDLE_NAME">Middle Name</md-option>
+            <md-option value="LAST_NAME">Last Name</md-option>
+            <md-option value="PSU_ID">PSU ID</md-option>
+            <md-option value="CAMPUS">Campus</md-option>
+            <md-option value="CITIZENSHIP">Citizenship</md-option>
+          </md-select>
         </md-field>
       </md-table-toolbar>
 
@@ -18,7 +30,8 @@
       </md-table-empty-state>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }" @click.native="openTranscript(item)" v-bind:class="{'checked-out': item.CHECKED_OUT}">
-          <md-table-cell md-label="Time" md-sort-by="TIMESTAMP" md-numeric>{{ item.TIMESTAMP }}</md-table-cell>
+          <md-table-cell md-label="Date" md-sort-by="TIMESTAMP" md-numeric>{{ new Date(item.TIMESTAMP).toLocaleDateString() }}</md-table-cell>
+          <md-table-cell md-label="Time">{{ new Date(item.TIMESTAMP).toLocaleTimeString() }}</md-table-cell>
           <md-table-cell md-label="First" md-sort-by="FIRST_NAME">{{ item.FIRST_NAME }}</md-table-cell>
           <md-table-cell md-label="Middle" md-sort-by="MIDDLE_NAME">{{ item.MIDDLE_NAME }}</md-table-cell>
           <md-table-cell md-label="Last" md-sort-by="LAST_NAME">{{ item.LAST_NAME }}</md-table-cell>
@@ -35,9 +48,21 @@
     return text.toString().toLowerCase()
   }
 
-  const searchByName = (items, term) => {
+  const searchByFields = (items, term, fields) => {
     if (term) {
-      return items.filter(item => toLower(item.name).includes(toLower(term)))
+      let searchedFieldArrays = [];
+      fields.forEach((field) => {
+        searchedFieldArrays.push(items.filter(item => toLower(item[field]).includes(toLower(term))));
+      });
+      let searchedItems = [];
+      searchedFieldArrays.forEach((fieldArray) => {
+        fieldArray.forEach((item) => {
+          if(searchedItems.filter(e => e.DOCUMENT_ID === item.DOCUMENT_ID).length === 0){
+            searchedItems.push(item);
+          }
+        });
+      });
+      return searchedItems;
     }
 
     return items
@@ -53,6 +78,8 @@
     },
     data: () => ({
       search: null,
+      searchFields: [],
+      transcripts: [],
       searched: []
     }),
     methods: {
@@ -60,7 +87,11 @@
         window.alert('Not yet implemented')
       },
       searchOnTable () {
-        this.searched = searchByName(this.$props.queue, this.search)
+        if(this.search && this.searchFields.length > 0){
+          this.searched = searchByFields(this.transcripts, this.search, this.searchFields);
+        } else {
+          this.searched = this.transcripts;
+        }
       },
       openTranscript (item) {
         if(item.CHECKED_OUT){
@@ -81,7 +112,10 @@
         immediate: true,
         deep: true,
         handler(val, oldVal){
-          this.searched = val
+          this.transcripts = val;
+          if(this.searchFields.length === 0){
+            this.searched = val;
+          }
         }
       }
     }
@@ -95,5 +129,8 @@
   .checked-out{
     background-color: rgba(255, 0, 0, 0.5);
     color: rgba(0,0,0,0.5);
+  }
+  .white {
+    background-color: white !important;
   }
 </style>
