@@ -13,10 +13,23 @@
           <md-card md-with-hover>
             <md-ripple>
               <md-card-header>
-                <div class="md-title">Dashboard Component</div>
+                <div class="md-title">Recent Change Log:</div>
               </md-card-header>
               <md-card-content>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio itaque ea, nostrum odio. Dolores, sed accusantium quasi non.</p>
+                <p>Version 0.20210219</p>
+                <ol>
+                  <li>Visual improvements to submission browser</li>
+                  <li>Added search functionality to submission browser</li>
+                  <li>Added sort functionality to submission browser</li>
+                </ol>
+                <p>Version 0.20210205</p>
+                <ol>
+                  <li>Complete transcript viewer functionality</li>
+                  <li>Added delete class functionality</li>
+                  <li>Visual improvements to class edit row</li>
+                  <li>Added course check functionality</li>
+                  <li>Completed first build to production version</li>
+                </ol>
               </md-card-content>
               <md-card-actions>
                 <md-button>Do Something</md-button>
@@ -33,7 +46,13 @@
 import AppNavDrawer from './AppNavDrawer'
 export default {
   name: 'Dashboard',
-  components: {AppNavDrawer}
+  components: {AppNavDrawer},
+  created() {
+    if(!sessionStorage.getItem("uid")){
+      const uid = prompt("Username: ");
+      sessionStorage.setItem("uid", uid);
+    }
+  }
 }
 </script>
 
