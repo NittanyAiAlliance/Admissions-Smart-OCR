@@ -48,8 +48,7 @@ export default {
     handleCancel(){
       // Since the action was cancelled, it was not submitted
       this.submitted = false
-      // Dispatch the check in event to the store
-      this.dispatchCheckIn()
+      this.$router.push({name : 'Queue'})
     },
     /**
      * Handle user clicks the submit button
@@ -79,7 +78,7 @@ export default {
   },
   created() {
     // Set handler for the window closing
-    document.addEventListener('beforeunload', this.handleCloseWindow)
+    document.addEventListener('onbeforeunload', this.handleCloseWindow)
     // Fetch the specified transcript
     get.getQueuedTranscriptResults(this.$route.params.transcript.DOCUMENT_ID).then(response => {
       // Set the local transcript data
