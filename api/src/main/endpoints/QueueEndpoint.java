@@ -10,13 +10,13 @@ import java.util.Date;
 public class QueueEndpoint extends Endpoint {
 
     @Override
-    public JSONObject fulfillRequest(JSONObject cmd, WebSocketClient conn) {
+    public JSONObject fulfillRequest(JSONObject cmd) {
         String type = cmd.getString("type");
         switch (type) {
-            case "check-out":
+            case "checkOut":
                 this.handleCheckOut(cmd);
                 break;
-            case "check-in":
+            case "checkIn":
                 this.handleCheckIn(cmd);
                 break;
             default:
@@ -32,7 +32,10 @@ public class QueueEndpoint extends Endpoint {
                     cmd.getString("uid"),
                     new Date()
             );
-            InteractionLogListener.enqueue(interactionLog);
+            InteractionLogListener.enqueue(new JSONObject(){{
+                put("checkedout", true);
+                put("did", cmd.getString("did"));
+            }});
         } catch (InterruptedException iEx) {
             iEx.printStackTrace();
         }
@@ -46,7 +49,10 @@ public class QueueEndpoint extends Endpoint {
                     cmd.getString("uid"),
                     new Date()
             );
-            InteractionLogListener.enqueue(interactionLog);
+            InteractionLogListener.enqueue(new JSONObject(){{
+                put("checkedout", false);
+                put("did", cmd.getString("did"));
+            }});
         } catch (InterruptedException iEx) {
             iEx.printStackTrace();
         }

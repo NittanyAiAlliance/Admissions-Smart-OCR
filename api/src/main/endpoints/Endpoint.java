@@ -7,9 +7,9 @@ public abstract class Endpoint {
     protected String[] requiredKeys;
     protected String endpointName;
 
-    public JSONObject handle(JSONObject cmd, WebSocketClient conn){
-        return fulfillRequest(cmd, conn);
+    public JSONObject handle(JSONObject cmd){
+        return fulfillRequest(cmd);
     }
 
-    public abstract JSONObject fulfillRequest(JSONObject cmd, WebSocketClient conn);
+    public abstract JSONObject fulfillRequest(JSONObject cmd);
 }
