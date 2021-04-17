@@ -77,7 +77,7 @@ public class TranscriptManager {
     }
 
     public JSONArray fetchQueue() throws SQLException {
-        String fetchQueueSql = "SELECT TIMESTAMP, PSU_ID FROM TRANSCRIPT_QUEUE";
+        String fetchQueueSql = "SELECT TIMESTAMP, PSU_ID, HS_EXT_ID, FIRST_NAME, MIDDLE_NAME, LAST_NAME, CAMPUS, CITIZENSHIP, DOCUMENT_ID, CHECKED_OUT FROM TRANSCRIPT_QUEUE";
         PreparedStatement fetchQueueStmt = database.prepareStatement(fetchQueueSql);
         ResultSet fetchQueueResults = database.query(fetchQueueStmt);
         //TODO: move to non-JSON object array ~ for DEMO purposes only
@@ -86,12 +86,22 @@ public class TranscriptManager {
             transcripts.put(new JSONObject(){{
                 put("TIMESTAMP", fetchQueueResults.getTimestamp("TIMESTAMP").toString());
                 put("PSU_ID", fetchQueueResults.getString("PSU_ID"));
+                put("HS_EXT_ID", fetchQueueResults.getString("HS_EXT_ID"));
+                put("FIRST_NAME", fetchQueueResults.getString("FIRST_NAME"));
+                put("MIDDLE_NAME", fetchQueueResults.getString("MIDDLE_NAME"));
+                put("LAST_NAME", fetchQueueResults.getString("LAST_NAME"));
+                put("CAMPUS", fetchQueueResults.getString("CAMPUS"));
+                put("CITIZENSHIP", fetchQueueResults.getString("CITIZENSHIP"));
+                put("DOCUMENT_ID", fetchQueueResults.getString("DOCUMENT_ID"));
+                put("CHECKED_OUT", fetchQueueResults.getBoolean("CHECKED_OUT"));
             }});
         }
         return transcripts;
     }
 
     public JSONObject fetchQueuedTranscripts() {
+        String fetchTranscriptResult = "SELECT RESULTS FROM TRANSCRIPT_QUEUE WHERE DOCUMENT_ID = ?";
+
         return new JSONObject(){{
             put("COURSES", new JSONArray("[{\"credits\":\"1.00\",\"grade\":\"92\",\"generic_name\":\"SPANISH 3\",\"name\":\"SPANISH 3\"},{\"credits\":\"1.00\",\"grade\":\"80\",\"generic_name\":\"Others\",\"name\":\"CP BRIT LIT\"},{\"credits\":\"1.00\",\"grade\":\"98\",\"generic_name\":\"COMPUTER SCIENCE 1\",\"name\":\"AP COMPUTER SCIENCE\"},{\"credits\":\"1.00\",\"grade\":\"73\",\"generic_name\":\"PHYSICS\",\"name\":\"HNRS PHYSICS\"},{\"credits\":\".50\",\"grade\":\"76\",\"generic_name\":\"PHYSICS\",\"name\":\"HNRS PHYSICS LAB\"},{\"credits\":\"1.00\",\"grade\":\"89\",\"generic_name\":\"Others\",\"name\":\"Digital Electronics (DE)\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 11\",\"name\":\"DIRECTED STUDY 11\"},{\"credits\":\".50\",\"grade\":\"97\",\"generic_name\":\"ENGLISH 11\",\"name\":\"PE 11\"},{\"credits\":\"1.00\",\"grade\":\"86\",\"generic_name\":\"Others\",\"name\":\"HNRS PRECALC\"},{\"credits\":\"1.00\",\"grade\":\"83\",\"generic_name\":\"Others\",\"name\":\"HNRS WLDHIST\"},{\"credits\":\"1.00\",\"grade\":\"90\",\"generic_name\":\"Others\",\"name\":\"Easton Area High School CPLIT/COMP9\"},{\"credits\":\"1.00\",\"grade\":\"88\",\"generic_name\":\"BANKING AND FINANCE\",\"name\":\"Intro to Engineering and Design (IED)\"},{\"grade\":\"89\",\"generic_name\":\"ENGLISH 9\",\"name\":\"PE 9\"},{\"credits\":\"1.00\",\"grade\":\"96\",\"generic_name\":\"SPANISH 2\",\"name\":\"SPANISH 2\"},{\"credits\":\"1.00\",\"grade\":\"83\",\"generic_name\":\"Others\",\"name\":\"HNS USHIST I\"},{\"credits\":\"1.00\",\"grade\":\"90\",\"generic_name\":\"COMPUTER APPLICATIONS\",\"name\":\"Honors Computer Science Principles\"},{\"grade\":\"50\",\"generic_name\":\"COMPUTER SCIENCE 1\",\"name\":\"HNRS E & SPACE SCIENCE LAB 90\"},{\"credits\":\"1.00\",\"grade\":\"73\",\"generic_name\":\"GEOMETRY\",\"name\":\"HNRS GEOMTRY\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 9\",\"name\":\"DIRECTED STUDY 9\"},{\"credits\":\"1.00\",\"grade\":\"88\",\"generic_name\":\"EARTH SCIENCE\",\"name\":\"HNRS E & SPACE SCIENCE\"},{\"credits\":\"1.00\",\"grade\":\"84\",\"generic_name\":\"Others\",\"name\":\"Easton Area High School CP AMER LIT\"},{\"credits\":\"1.00\",\"grade\":\"91\",\"generic_name\":\"COMPUTER SCIENCE 2\",\"name\":\"HNRS ALG 2\"},{\"credits\":\"1.00\",\"grade\":\"81\",\"generic_name\":\"BIOLOGY\",\"name\":\"HNRS BIOLOGY\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 10\",\"name\":\"DIRECTED STUDY 10\"},{\"credits\":\"50\",\"grade\":\"80\",\"generic_name\":\"HEALTH EDUCATION\",\"name\":\"HEALTH 10\"},{\"grade\":\"84\",\"generic_name\":\"Others\",\"name\":\"PE 10 FITNESS\"},{\"credits\":\"1.00\",\"grade\":\"93\",\"generic_name\":\"Others\",\"name\":\"Principles of Engineering (POE)\"},{\"generic_name\":\"BIOLOGY\",\"name\":\"HNRS BIOLOGY LAB 81 50\"},{\"credits\":\"1.00\",\"grade\":\"95\",\"generic_name\":\"COMPUTER SCIENCE 2\",\"name\":\"HNS USHIST 2\"}],\"name\":\"\"}]"));
             put("RECEIVED_TIMESTAMP", "2020-12-01 01:14:12.0");
