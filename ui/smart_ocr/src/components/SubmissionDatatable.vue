@@ -25,7 +25,6 @@
           <md-table-cell md-label="PSU ID" md-sort-by="PSU_ID">{{ item.PSU_ID }}</md-table-cell>
           <md-table-cell md-label="Campus" md-sort-by="CAMPUS">{{ item.CAMPUS }}</md-table-cell>
           <md-table-cell md-label="Residency" md-sort-by="CITIZENSHIP">{{ item.CITIZENSHIP }}</md-table-cell>
-          <md-table-cell md-label="Checked Out">{{item.CHECKED_OUT}}</md-table-cell>
       </md-table-row>
     </md-table>
   </div>
@@ -64,6 +63,10 @@
         this.searched = searchByName(this.$props.queue, this.search)
       },
       openTranscript (item) {
+        if(item.CHECKED_OUT){
+          alert("This transcript is currently checked out by someone else and cannot be opened");
+          return;
+        }
         // Dispatch the check out event with the selected PSU ID
         this.$store.dispatch('checkOut', item.DOCUMENT_ID);
         // Navigate to the transcript viewer with the transcript object as the payload
@@ -90,6 +93,7 @@
     max-width: 300px;
   }
   .checked-out{
-    background-color: red;
+    background-color: rgba(255, 0, 0, 0.5);
+    color: rgba(0,0,0,0.5);
   }
 </style>
