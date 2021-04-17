@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpsServer;
 import main.endpoints.Endpoint;
 import main.endpoints.QueueEndpoint;
 import main.handlers.*;
+import main.listeners.InteractionLogListener;
 
 import javax.net.ssl.*;
 import java.io.InputStream;
@@ -82,13 +83,14 @@ public class Server {
      * @throws Exception exception thrown during socket start
      */
     private static void initSocket() throws Exception {
+        InteractionLogListener.startListener();
         // Create map of endpoints to register with the socket
         Map<String, Endpoint> endpointMap =
                 new HashMap<>() {{
                     put("queue", new QueueEndpoint());
                 }};
         // Create the socket object
-        Socket socket = new Socket(API_PORT, "SMART_OCR_SOCKET", endpointMap);
+        Socket socket = new Socket(SOCKET_PORT, "SMART_OCR_SOCKET", endpointMap);
         // Start the socket listener
         socket.start();
     }
