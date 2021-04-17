@@ -32,7 +32,7 @@
           <span class="md-helper-text">PSU ID</span>
         </md-field>
         <md-field>
-          <md-input v-model="transcript.TIMESTAMP" readonly></md-input>
+          <md-input v-model="transcript.TIMESTAMP.toLocaleString()" readonly></md-input>
           <span class="md-helper-text">Submission Timestamp</span>
         </md-field>
       </div>

@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     transcripts() {
-      return Array.from(this.$store.state.transcripts.values());
+      return Array.from(this.$store.state.transcripts.values())
     },
     isLoading() {
       return this.$store.state.transcripts.size === 0;
