@@ -6,11 +6,10 @@ Vue.use(Vuex)
 
 const Store = new Vuex.Store({
   state : {
+    // WebSocket client object
     client : null,
+    // Transcript map, key is document id, value is transcript data object
     transcripts: new Map()
-  },
-  getters : {
-    getTranscripts : state => state.transcripts
   },
   actions : {
     handleUpdate(context, msg) {
@@ -43,8 +42,6 @@ const Store = new Vuex.Store({
       client.onerror = () => context.dispatch('handleError');
       // Commit mutation to store the client object that was just created
       context.commit('createConnection', client);
-      // TODO: DEBUG
-      console.log("CREATED CONNECTION");
     },
     /**
      * Send a check out message to the transcript queue socket
@@ -63,8 +60,6 @@ const Store = new Vuex.Store({
       });
       // Send the check out command to the queue socket
       context.state.client.send(checkOutCmd);
-      // TODO: DEBUG
-      console.log("CHECKED OUT: " + transcriptId);
     },
     /**
      * Send a check in message to the transcript queue socket
@@ -83,9 +78,11 @@ const Store = new Vuex.Store({
       });
       // Send the check in command to the queue socket
       context.state.client.send(checkInCmd);
-      // TODO: DEBUG
-      console.log("CHECKED IN: " + transcriptId);
     },
+    /**
+     * Fetch the available transcripts in the queue from the API
+     * @param context context object
+     */
     fetchTranscripts(context) {
       get.getTranscriptQueue().then(transcripts => {
         context.commit('setTranscripts', transcripts.data.queue);
@@ -101,12 +98,21 @@ const Store = new Vuex.Store({
     createConnection(state, client) {
       state.client = client;
     },
+    /**
+     * Update the transcript map in application state
+     * @param state state object
+     * @param transcripts transcripts array from API
+     */
     setTranscripts(state, transcripts) {
+      // Create temp map
       const transcriptsMap = new Map();
+      // Iterate through API response array to get transcripts
       for(let i = 0; i < transcripts.length; i++) {
         const transcript = transcripts[i];
+        // Set a transcript to the temp map
         transcriptsMap.set(transcript.DOCUMENT_ID, transcript);
       }
+      // Update the state object with the new transcripts
       state.transcripts = transcriptsMap;
     },
     /**
@@ -115,7 +121,6 @@ const Store = new Vuex.Store({
      * @param transcriptId Document ID of the transcript that has been checked out
      */
     checkOut(state, transcriptId){
-      console.log("SOMEONE CHECKED OUT " + transcriptId);
       // Fetch the transcript that another client told us they checked out from the queue map
       const mutatedTranscript = state.transcripts.get(transcriptId);
       // Set the checked out flag to true ~ we just were told that it was checked out
@@ -129,7 +134,6 @@ const Store = new Vuex.Store({
      * @param transcriptId Document ID of the transcript that has been checked in
      */
     checkIn(state, transcriptId){
-      console.log("SOMEONE CHECKED IN " + transcriptId);
       // Fetch the transcript that another client told us they checked in from the queue map
       const mutatedTranscript = state.transcripts.get(transcriptId);
       // Set the checked in flag to false ~ we just were told that it was checked in
