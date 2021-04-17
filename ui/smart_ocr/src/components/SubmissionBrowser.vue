@@ -31,8 +31,6 @@
 <script>
 import AppNavDrawer from './AppNavDrawer'
 import SubmissionDatatable from './SubmissionDatatable'
-import get from '@/get'
-import client from "@/client"
 export default {
   name: 'SubmissionBrowser',
   components: {AppNavDrawer,SubmissionDatatable},

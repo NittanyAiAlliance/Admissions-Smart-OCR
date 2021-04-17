@@ -74,7 +74,7 @@ export default {
      */
     dispatchCheckIn(){
       // Dispatch the check in event with the transcript identifier
-      this.$store.dispatch('checkIn', this.transcript.PSU_ID);
+      this.$store.dispatch('checkIn', this.transcript.DOCUMENT_ID);
     }
   },
   created() {

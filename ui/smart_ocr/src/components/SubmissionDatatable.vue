@@ -65,7 +65,7 @@
       },
       openTranscript (item) {
         // Dispatch the check out event with the selected PSU ID
-        this.$store.dispatch('checkOut', item.PSU_ID);
+        this.$store.dispatch('checkOut', item.DOCUMENT_ID);
         // Navigate to the transcript viewer with the transcript object as the payload
         this.$router.push({ name : 'TranscriptViewer', params: { transcript: item} })
       }

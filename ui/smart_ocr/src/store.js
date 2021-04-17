@@ -58,7 +58,8 @@ const Store = new Vuex.Store({
         // Command type is check out
         type : "checkOut",
         // Document ID is the transcript ID that was checked out
-        did : transcriptId
+        did : transcriptId,
+        uid : sessionStorage.getItem("uid")
       });
       // Send the check out command to the queue socket
       context.state.client.send(checkOutCmd);
@@ -77,7 +78,8 @@ const Store = new Vuex.Store({
         // Command type is check in
         type : "checkIn",
         // Document ID is the transcript ID that was checked in
-        did : transcriptId
+        did : transcriptId,
+        uid : sessionStorage.getItem("uid")
       });
       // Send the check in command to the queue socket
       context.state.client.send(checkInCmd);
@@ -103,7 +105,7 @@ const Store = new Vuex.Store({
       const transcriptsMap = new Map();
       for(let i = 0; i < transcripts.length; i++) {
         const transcript = transcripts[i];
-        transcriptsMap.set(transcript.PSU_ID, transcript);
+        transcriptsMap.set(transcript.DOCUMENT_ID, transcript);
       }
       state.transcripts = transcriptsMap;
     },
