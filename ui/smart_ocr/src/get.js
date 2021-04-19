@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://3.15.215.137:2020/'
+axios.defaults.baseURL = 'https://localhost:2020/'
 
 export default {
   /**
@@ -16,7 +16,7 @@ export default {
    * @param transcriptId identifier of the transcript
    * @returns API response promise object
    */
-  getQueuedTranscript(transcriptId){
+  getQueuedTranscriptResults(transcriptId){
     const queuedTranscriptCmd = {
       "id": transcriptId
     };

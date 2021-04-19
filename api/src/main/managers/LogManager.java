@@ -2,6 +2,7 @@ package main.managers;
 
 import main.data.DatabaseInteraction;
 import main.types.ErrorLog;
+import main.types.InteractionLog;
 import main.types.Log;
 
 import java.io.BufferedWriter;
@@ -40,6 +41,19 @@ public class LogManager {
         } catch (SQLException sqlEx) {
             //Something went wrong - log the error to the error output
             writeErrorLog(new ErrorLog(sqlEx, "Writing transaction log failed"));
+        }
+    }
+
+    public void write(InteractionLog log) {
+        String writeLogSql = "INSERT INTO INTERACTION_LOGS(TITLE, DESCRIPTION, UID, TIMESTAMP) VALUES (?, ?, ?, ?)";
+        PreparedStatement writeLogStmt = database.prepareStatement(writeLogSql);
+        try {
+            writeLogStmt.setString(1, log.getTitle());
+            writeLogStmt.setString(2, log.getDescription());
+            writeLogStmt.setString(3, log.getUser());
+            writeLogStmt.setTimestamp(4, new Timestamp(log.getTimeStamp().getTime()));
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
         }
     }
 

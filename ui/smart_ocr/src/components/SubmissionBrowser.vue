@@ -14,16 +14,6 @@
       </md-app-drawer>
 
       <md-app-content>
-        <div v-if="transcripts.length > 0">
-          <md-card v-for="transcript in transcripts" :key="transcript.PSU_ID">
-            <router-link :to="{ name: 'TranscriptViewer', params: {id: transcript.PSU_ID}}">
-              <md-card-content>
-                <p>{{transcript.PSU_ID}}</p>
-                <p>{{transcript.TIMESTAMP}}</p>
-              </md-card-content>
-            </router-link>
-          </md-card>
-        </div>
         <div v-if="transcripts.length === 0 && !isLoading">
           <md-empty-state
             md-icon="image_search"
@@ -32,7 +22,7 @@
             <md-button class="md-primary md-raised">Click Me!</md-button>
           </md-empty-state>
         </div>
-        <SubmissionDatatable />
+        <SubmissionDatatable v-bind:queue="transcripts" />
       </md-app-content>
     </md-app>
   </div>
@@ -41,23 +31,28 @@
 <script>
 import AppNavDrawer from './AppNavDrawer'
 import SubmissionDatatable from './SubmissionDatatable'
-import get from '@/get';
 export default {
   name: 'SubmissionBrowser',
   components: {AppNavDrawer,SubmissionDatatable},
 
   data () {
     return {
-      menuVisible: false,
-      isLoading: true,
-      transcripts: []
+      menuVisible: false
     }
   },
   created() {
-    get.getTranscriptQueue().then(transcripts =>{
-      this.isLoading = false;
-      this.transcripts = transcripts.data.queue;
-    });
+    // Dispatch action to fetch transcripts
+    this.$store.dispatch('fetchTranscripts').then(() =>
+      // Dispatch action to create the socket connection
+      this.$store.dispatch('createSocketConnection'));
+  },
+  computed: {
+    transcripts() {
+      return Array.from(this.$store.state.transcripts.values())
+    },
+    isLoading() {
+      return this.$store.state.transcripts.size === 0;
+    }
   }
 }
 </script>

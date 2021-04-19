@@ -6,6 +6,7 @@ import router from './router'
 import VueMaterial from 'vue-material/'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
+import Store from "./store";
 
 Vue.config.productionTip = false
 
@@ -16,5 +17,6 @@ new Vue({
   el: '#app',
   router,
   components: { App },
+  store: Store,
   template: '<App/>'
 })

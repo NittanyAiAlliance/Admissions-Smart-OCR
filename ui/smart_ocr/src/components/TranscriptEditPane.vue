@@ -10,6 +10,9 @@
         <md-button class="md-primary" @click="handleSubmit">Yes, Confirm Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
+    <div>
+      <p>NOTE: This is a sample transcript which is served for all selections to demonstrate functionality.</p>
+    </div>
     <h1>Edit Transcript Information</h1>
     <md-divider />
     <div class="md-layout">
@@ -17,19 +20,19 @@
         <h3>Student Information</h3>
         <md-divider/>
         <md-field>
-          <md-input v-model="transcript.STUDENT.FIRST_NAME"></md-input>
+          <md-input v-model="transcript.FIRST_NAME"></md-input>
           <span class="md-helper-text">First Name</span>
         </md-field>
         <md-field>
-          <md-input v-model="transcript.STUDENT.LAST_NAME"></md-input>
+          <md-input v-model="transcript.LAST_NAME"></md-input>
           <span class="md-helper-text">Last Name</span>
         </md-field>
         <md-field>
-          <md-input v-model="transcript.STUDENT.PSU_ID"></md-input>
+          <md-input v-model="transcript.PSU_ID"></md-input>
           <span class="md-helper-text">PSU ID</span>
         </md-field>
         <md-field>
-          <md-input v-model="transcript.RECEIVED_TIMESTAMP" readonly></md-input>
+          <md-input v-model="transcript.TIMESTAMP.toLocaleString()" readonly></md-input>
           <span class="md-helper-text">Submission Timestamp</span>
         </md-field>
       </div>
@@ -37,19 +40,7 @@
         <h3>High School Information</h3>
         <md-divider/>
         <md-field>
-          <md-input v-model="transcript.HIGH_SCHOOL.NAME"></md-input>
-          <span class="md-helper-text">High School Name</span>
-        </md-field>
-        <md-field>
-          <md-input v-model="transcript.HIGH_SCHOOL.ADDRESS"></md-input>
-          <span class="md-helper-text">Address</span>
-        </md-field>
-        <md-field>
-          <md-input v-model="transcript.HIGH_SCHOOL.PHONE"></md-input>
-          <span class="md-helper-text">Phone Number</span>
-        </md-field>
-        <md-field>
-          <md-input v-model="transcript.HIGH_SCHOOL.CEEB"></md-input>
+          <md-input v-model="transcript.HS_EXT_ID"></md-input>
           <span class="md-helper-text">CEEB Code</span>
         </md-field>
       </div>
@@ -71,7 +62,7 @@
         </md-list-item>
       </md-list>
       <div class="md-layout md-alignment-bottom-right">
-        <md-button class="md-raised alert-warning">Discard Changes</md-button>
+        <md-button class="md-raised alert-warning" @click="this.handleCancel">Discard Changes</md-button>
         <md-button class="md-raised md-primary" @click="showConfirmSubmit = true">Submit</md-button>
       </div>
     </div>
@@ -140,7 +131,10 @@ export default {
      * @param e event arg object
      */
     handleSubmit: function(e) {
-
+      this.$emit('submit')
+    },
+    handleCancel: function(e) {
+      this.$emit('cancel')
     }
   },
   props: ['transcript']

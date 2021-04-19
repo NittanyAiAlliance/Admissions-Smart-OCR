@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class GetQueuedTranscriptHandler extends HandlerPrototype implements HttpHandler {
     public GetQueuedTranscriptHandler(){
-        super.requiredKeys = new String[] {};
+        super.requiredKeys = new String[] { "id" };
         super.handlerName = "";
     }
     @Override

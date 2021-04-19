@@ -3,15 +3,21 @@ package main;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
+import main.endpoints.Endpoint;
+import main.endpoints.QueueEndpoint;
 import main.handlers.*;
+import main.listeners.InteractionLogListener;
 
 import javax.net.ssl.*;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
     private static final int API_PORT = 2020;
+    private static final int SOCKET_PORT = 2021;
     public static void main(String args[]){
         System.out.println("Begin server start");
         try {
@@ -19,6 +25,9 @@ public class Server {
             initServer();
             System.out.println("Completed server start - SUCCESS");
             System.out.println("Server listening on port: " + API_PORT);
+            initSocket();
+            System.out.println("Completed socket start - SUCCESS");
+            System.out.println("Socket listening on post: " + SOCKET_PORT);
         } catch (Exception ex){
             //Server start failed
             System.out.println("Completed server start - FAILURE");
@@ -67,6 +76,23 @@ public class Server {
         server = createHandlerContexts(server);
         server.setExecutor(null);
         server.start();
+    }
+
+    /**
+     * Configure and launch WebSocket server
+     * @throws Exception exception thrown during socket start
+     */
+    private static void initSocket() throws Exception {
+        InteractionLogListener.startListener();
+        // Create map of endpoints to register with the socket
+        Map<String, Endpoint> endpointMap =
+                new HashMap<>() {{
+                    put("queue", new QueueEndpoint());
+                }};
+        // Create the socket object
+        Socket socket = new Socket(SOCKET_PORT, "SMART_OCR_SOCKET", endpointMap);
+        // Start the socket listener
+        socket.start();
     }
 
     /**
