@@ -39,6 +39,8 @@ def eval():
             if(this_label != 'EXTRA' and this_label != 'COURSE_SUBJECT' and this_label != 'COURSE_NAME'):
                 hit = False
                 for entry in range(1, len(line)): # Iterate returned labels
+                    if(this_label == 'COURSE_CODE'):
+                        print('Comparing ' + line[entry][0] + ' to ' + this_label + ' and ' + line[entry][1] + ' to ' + this_text)
                     if(line[entry][0] == this_label and line[entry][1] == this_text): # Return hit on exact match
                         inc_hits(this_label)
                         hit = True
