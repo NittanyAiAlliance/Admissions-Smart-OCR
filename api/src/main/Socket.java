@@ -1,23 +1,13 @@
 package main;
 
 import main.endpoints.Endpoint;
-import main.managers.RoomManager;
-import main.types.Room;
-import main.types.WebSocketClient;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Prototype for a socket endpoint

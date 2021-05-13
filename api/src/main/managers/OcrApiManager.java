@@ -21,7 +21,7 @@ import java.util.List;
 public class OcrApiManager {
 
     //Constant URL for OCR API
-    private final String internalUrl = "http://localhost:5000";
+    private final String internalUrl = "http://3.15.215.137:2022/api/";
 
     public OcrApiManager() { }
 
@@ -35,11 +35,11 @@ public class OcrApiManager {
         //Create the request object and send to the OCR API
         HttpURLConnection ocrConn = sendOcrRequest(fileStr);
         //Does the request code tell us everything is good?
-        int responseCode = ocrConn.getResponseCode();
+        /*int responseCode = ocrConn.getResponseCode();
         if(responseCode != 200){
             //There was an error with making the OCR request
             throw new IOException();
-        }
+        }*/
         //Read the response to the OCR request and return the result
         return readOcrResponse(ocrConn);
     }
@@ -138,7 +138,7 @@ public class OcrApiManager {
         HttpURLConnection httpClient = (HttpURLConnection)new URL(internalUrl).openConnection();
         //Set required parameters of the request object
         httpClient.setRequestMethod("POST");
-        httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+        httpClient.setRequestProperty("Content-type", "application/json");
         httpClient.setDoOutput(true);
         return httpClient;
     }

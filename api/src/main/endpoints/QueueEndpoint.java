@@ -35,6 +35,7 @@ public class QueueEndpoint extends Endpoint {
             InteractionLogListener.enqueue(new JSONObject(){{
                 put("checkedout", true);
                 put("did", cmd.getString("did"));
+                put("uid", cmd.getString("uid"));
             }});
         } catch (InterruptedException iEx) {
             iEx.printStackTrace();
@@ -52,6 +53,7 @@ public class QueueEndpoint extends Endpoint {
             InteractionLogListener.enqueue(new JSONObject(){{
                 put("checkedout", false);
                 put("did", cmd.getString("did"));
+                put("uid", cmd.getString("uid"));
             }});
         } catch (InterruptedException iEx) {
             iEx.printStackTrace();

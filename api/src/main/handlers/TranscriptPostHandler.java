@@ -25,7 +25,6 @@ public class TranscriptPostHandler extends HandlerPrototype implements HttpHandl
             //Attempt to create a new transcript object and record
             Transcript newTranscript = transcriptManager.createNew(metadata, file);
             //Let the server know to start parsing these transcripts
-            TranscriptQueueListener.enqueue(newTranscript.getId());
             //It worked, no args to return
             returnActionSuccess();
         } catch(SQLException sqlEx) {

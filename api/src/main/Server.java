@@ -7,8 +7,12 @@ import main.endpoints.Endpoint;
 import main.endpoints.QueueEndpoint;
 import main.handlers.*;
 import main.listeners.InteractionLogListener;
+import main.listeners.OCRQueueListener;
+import main.listeners.TranscriptQueueListener;
+import main.managers.ExternalDataManager;
 
 import javax.net.ssl.*;
+import java.io.Externalizable;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
@@ -76,6 +80,7 @@ public class Server {
         server = createHandlerContexts(server);
         server.setExecutor(null);
         server.start();
+        new ExternalDataManager().requestAvailableTranscripts();
     }
 
     /**
@@ -84,6 +89,8 @@ public class Server {
      */
     private static void initSocket() throws Exception {
         InteractionLogListener.startListener();
+        OCRQueueListener.startListener();
+        TranscriptQueueListener.startListener();
         // Create map of endpoints to register with the socket
         Map<String, Endpoint> endpointMap =
                 new HashMap<>() {{

@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpHandler;
 import main.managers.TranscriptManager;
 import org.json.JSONObject;
 
+import java.sql.SQLException;
+
 public class GetQueuedTranscriptHandler extends HandlerPrototype implements HttpHandler {
     public GetQueuedTranscriptHandler(){
         super.requiredKeys = new String[] { "id" };
@@ -11,6 +13,11 @@ public class GetQueuedTranscriptHandler extends HandlerPrototype implements Http
     }
     @Override
     public void fulfillRequest(JSONObject requestParams) {
-        returnActionSuccess(new TranscriptManager().fetchQueuedTranscripts());
+        String docId = requestParams.getString("id");
+        try{
+            returnActionSuccess(new TranscriptManager().fetchResults(docId));
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
     }
 }

@@ -50,17 +50,24 @@ public class TranscriptManager {
 
     /**
      * Record the results of the OCR scan and parse of this transcript
-     * @param ocrResponseObject formatted response object from the OCR API
+     * @param ocrResponse formatted response object from the OCR API
      */
-    public void putResults(JSONObject ocrResponseObject, Transcript transcript) throws SQLException {
-        String insertTranscriptResultsSql = "INSERT INTO TRANSCRIPT_QUEUE (PSU_ID, RESULTS) VALUES (?, ?)";
+    public void putResults(String ocrResponse, Transcript transcript) throws SQLException {
+        String insertTranscriptResultsSql = "INSERT INTO TRANSCRIPT_QUEUE (RESULTS, PSU_ID, HS_EXT_ID, FIRST_NAME, MIDDLE_NAME, LAST_NAME, CAMPUS, CITIZENSHIP, DOCUMENT_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement insertTranscriptResultsStmt = database.prepareStatement(insertTranscriptResultsSql);
-        //Set the transcript ID argument
-        insertTranscriptResultsStmt.setString(1, transcript.getPsuId());
         //Set the OCR response object BLOB
         Blob resultsBlob = database.getBlob();
-        resultsBlob.setBytes(1, ocrResponseObject.toString().getBytes());
-        insertTranscriptResultsStmt.setBlob(2, resultsBlob);
+        resultsBlob.setBytes(1, ocrResponse.getBytes());
+        insertTranscriptResultsStmt.setBlob(1, resultsBlob);
+        //Set the other metadata properties relevant to the transcript queue
+        insertTranscriptResultsStmt.setString(2, transcript.getMetaDataProp("PSU_ID"));
+        insertTranscriptResultsStmt.setString(3, transcript.getMetaDataProp("HS_EXT_ID"));
+        insertTranscriptResultsStmt.setString(4, transcript.getMetaDataProp("FIRST_NAME"));
+        insertTranscriptResultsStmt.setString(5, transcript.getMetaDataProp("MIDDLE_NAME"));
+        insertTranscriptResultsStmt.setString(6, transcript.getMetaDataProp("LAST_NAME"));
+        insertTranscriptResultsStmt.setString(7, transcript.getMetaDataProp("CAMPUS"));
+        insertTranscriptResultsStmt.setString(8, transcript.getMetaDataProp("CITIZENSHIP"));
+        insertTranscriptResultsStmt.setString(9, transcript.getMetaDataProp("DOCUMENT_ID"));
         //Write the data record to the database
         database.nonQuery(insertTranscriptResultsStmt);
     }
@@ -99,24 +106,39 @@ public class TranscriptManager {
         return transcripts;
     }
 
-    public JSONObject fetchQueuedTranscripts() {
-        String fetchTranscriptResult = "SELECT RESULTS FROM TRANSCRIPT_QUEUE WHERE DOCUMENT_ID = ?";
+    /**
+     * Fetch the results of a transcript in the transcript queue
+     * @param docId id of the requesting transcript document
+     * @return results JSON object
+     * @throws SQLException sql exception in the query of the results
+     */
+    public JSONObject fetchResults(String docId) throws SQLException {
+        String fetchTranscriptResultSql = "SELECT RESULTS FROM TRANSCRIPT_QUEUE WHERE DOCUMENT_ID = ?";
+        PreparedStatement fetchTranscriptResultStmt = database.prepareStatement(fetchTranscriptResultSql);
+        fetchTranscriptResultStmt.setString(1, docId);
+        ResultSet results = database.query(fetchTranscriptResultStmt);
+        results.next();
+        Blob resultBlob = results.getBlob("RESULTS");
+        byte[] resultBytes = resultBlob.getBytes(1, (int)resultBlob.length());
+        return new JSONObject(new String(resultBytes));
+    }
 
-        return new JSONObject(){{
-            put("COURSES", new JSONArray("[{\"credits\":\"1.00\",\"grade\":\"92\",\"generic_name\":\"SPANISH 3\",\"name\":\"SPANISH 3\"},{\"credits\":\"1.00\",\"grade\":\"80\",\"generic_name\":\"Others\",\"name\":\"CP BRIT LIT\"},{\"credits\":\"1.00\",\"grade\":\"98\",\"generic_name\":\"COMPUTER SCIENCE 1\",\"name\":\"AP COMPUTER SCIENCE\"},{\"credits\":\"1.00\",\"grade\":\"73\",\"generic_name\":\"PHYSICS\",\"name\":\"HNRS PHYSICS\"},{\"credits\":\".50\",\"grade\":\"76\",\"generic_name\":\"PHYSICS\",\"name\":\"HNRS PHYSICS LAB\"},{\"credits\":\"1.00\",\"grade\":\"89\",\"generic_name\":\"Others\",\"name\":\"Digital Electronics (DE)\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 11\",\"name\":\"DIRECTED STUDY 11\"},{\"credits\":\".50\",\"grade\":\"97\",\"generic_name\":\"ENGLISH 11\",\"name\":\"PE 11\"},{\"credits\":\"1.00\",\"grade\":\"86\",\"generic_name\":\"Others\",\"name\":\"HNRS PRECALC\"},{\"credits\":\"1.00\",\"grade\":\"83\",\"generic_name\":\"Others\",\"name\":\"HNRS WLDHIST\"},{\"credits\":\"1.00\",\"grade\":\"90\",\"generic_name\":\"Others\",\"name\":\"Easton Area High School CPLIT/COMP9\"},{\"credits\":\"1.00\",\"grade\":\"88\",\"generic_name\":\"BANKING AND FINANCE\",\"name\":\"Intro to Engineering and Design (IED)\"},{\"grade\":\"89\",\"generic_name\":\"ENGLISH 9\",\"name\":\"PE 9\"},{\"credits\":\"1.00\",\"grade\":\"96\",\"generic_name\":\"SPANISH 2\",\"name\":\"SPANISH 2\"},{\"credits\":\"1.00\",\"grade\":\"83\",\"generic_name\":\"Others\",\"name\":\"HNS USHIST I\"},{\"credits\":\"1.00\",\"grade\":\"90\",\"generic_name\":\"COMPUTER APPLICATIONS\",\"name\":\"Honors Computer Science Principles\"},{\"grade\":\"50\",\"generic_name\":\"COMPUTER SCIENCE 1\",\"name\":\"HNRS E & SPACE SCIENCE LAB 90\"},{\"credits\":\"1.00\",\"grade\":\"73\",\"generic_name\":\"GEOMETRY\",\"name\":\"HNRS GEOMTRY\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 9\",\"name\":\"DIRECTED STUDY 9\"},{\"credits\":\"1.00\",\"grade\":\"88\",\"generic_name\":\"EARTH SCIENCE\",\"name\":\"HNRS E & SPACE SCIENCE\"},{\"credits\":\"1.00\",\"grade\":\"84\",\"generic_name\":\"Others\",\"name\":\"Easton Area High School CP AMER LIT\"},{\"credits\":\"1.00\",\"grade\":\"91\",\"generic_name\":\"COMPUTER SCIENCE 2\",\"name\":\"HNRS ALG 2\"},{\"credits\":\"1.00\",\"grade\":\"81\",\"generic_name\":\"BIOLOGY\",\"name\":\"HNRS BIOLOGY\"},{\"credits\":\"50\",\"grade\":\"P\",\"generic_name\":\"ENGLISH 10\",\"name\":\"DIRECTED STUDY 10\"},{\"credits\":\"50\",\"grade\":\"80\",\"generic_name\":\"HEALTH EDUCATION\",\"name\":\"HEALTH 10\"},{\"grade\":\"84\",\"generic_name\":\"Others\",\"name\":\"PE 10 FITNESS\"},{\"credits\":\"1.00\",\"grade\":\"93\",\"generic_name\":\"Others\",\"name\":\"Principles of Engineering (POE)\"},{\"generic_name\":\"BIOLOGY\",\"name\":\"HNRS BIOLOGY LAB 81 50\"},{\"credits\":\"1.00\",\"grade\":\"95\",\"generic_name\":\"COMPUTER SCIENCE 2\",\"name\":\"HNS USHIST 2\"}],\"name\":\"\"}]"));
-            put("RECEIVED_TIMESTAMP", "2020-12-01 01:14:12.0");
-            put("PROCESSED_TIMESTAMP", "2020-12-01 03:32:15.0");
-            put("HIGH_SCHOOL", new JSONObject() {{
-                put("NAME", "Boyertown Area Senior High School");
-                put("ADDRESS", "20 Monroe St Boyertown, PA 19512");
-                put("PHONE", "610-334-8020");
-                put("CEEB", "359580");
-            }});
-            put("STUDENT", new JSONObject() {{
-                put("FIRST_NAME", "Joel");
-                put("LAST_NAME", "Seidel");
-                put("PSU_ID", "JDS6294");
-            }});
-        }};
+    /**
+     * Insert a transcript record into the database
+     * @param transcript transcript to insert
+     */
+    public void putTranscript(Transcript transcript) throws SQLException {
+        String putTranscriptSql = "INSERT INTO TRANSCRIPTS (TRANSCRIPT_ID, TRANSCRIPT_FILE, METADATA) VALUES (?, ?, ?)";
+        PreparedStatement putTranscriptStmt = database.prepareStatement(putTranscriptSql);
+        putTranscriptStmt.setString(1, transcript.getDocId());
+        //Create transcript image blob
+        Blob imageFileBlob = database.getBlob();
+        imageFileBlob.setBytes(1, transcript.getImageBlob());
+        putTranscriptStmt.setBlob(2, imageFileBlob);
+        //Create metadata object blob
+        Blob metaDataBlob = database.getBlob();
+        metaDataBlob.setBytes(1, transcript.getMetaDataBlob());
+        putTranscriptStmt.setBlob(3, metaDataBlob);
+        database.nonQuery(putTranscriptStmt);
     }
 }
