@@ -1,20 +1,20 @@
 <template>
    <div>
-     <md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
+     <md-table v-model="logs" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
         <md-table-toolbar>
             <div class="md-toolbar-section-start">
                 <h1 class="md-title">Transcript History</h1>
             </div>
-   
+            <!--
             <div class="md-toolbar-section-start">
                 <md-field md-clearable class="md-toolbar-section-start">
                     <md-input placeholder="Title..." v-model="search" @input="searchTitleOnTable" />
-                </md-field> 
+                </md-field>
 
                 <md-field md-clearable class="md-toolbar-section-start">
                     <md-input placeholder="PSU ID..." v-model="search" @input="searchPSUIdOnTable"/>
                 </md-field>
-                
+
                 <md-field md-clearable class="md-toolbar-section-start">
                     <md-input placeholder="Description..." v-model="search" @input="searchDescriptionOnTable"/>
                 </md-field>
@@ -22,24 +22,23 @@
                 <md-field md-clearable class="md-toolbar-section-start">
                     <md-input placeholder="Timestamp..." v-model="search" @input="searchTimestampOnTable"/>
                 </md-field>
-            </div>
+            </div>-->
         </md-table-toolbar>
-        <!--
-        <md-table-empty-state
+        <!--<md-table-empty-state
             md-label="No users found"
             :md-description="`No user found for this '${search}' query. Try a different search term or create a new user.`">
             <md-button class="md-primary md-raised" @click="newUser">Create New User</md-button>
       </md-table-empty-state> -->
 
         <md-table-row slot="md-table-row" slot-scope="{ item }">
-          <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
-          <md-table-cell md-label="Title" md-sort-by="title">{{ item.title }}</md-table-cell>
-          <md-table-cell md-label="PSU ID" md-sort-by="psuId">{{ item.psuId }}</md-table-cell>        
-          <md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
           <md-table-cell md-label="Timestamp" md-sort-by="timestamp">{{ item.timestamp }}</md-table-cell>
+          <md-table-cell md-label="User" md-sort-by="uid">{{ item.uid }}</md-table-cell>
+          <md-table-cell md-label="Document ID" md-sort-by="did">{{ item.did }}</md-table-cell>
+          <md-table-cell md-label="Title" md-sort-by="title">{{ item.title }}</md-table-cell>
+          <md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
         </md-table-row>
-    </md-table> 
-   </div> 
+    </md-table>
+   </div>
 </template>
 
 <!-- Define function for searching PSU ID, Log Title, timestamp -->
@@ -75,7 +74,7 @@ const toLower = text => {
     }
     return items
   }
-  
+
 
 
 
@@ -86,37 +85,7 @@ export default {
     name: 'TranscriptHistory',
     data: () => ({
         search: null,
-        searched: [],
-        logs: [
-            {
-                id: 1,
-                title: "Title 1",
-                psuId: 99999999,
-                description: "Description 1",
-                timestamp: "May 20"
-            },
-            {
-                id: 2,
-                title: "Title 2",
-                psuId: 88888888,
-                description: "Description 2",
-                timestamp: "May 21"
-            },
-            {
-                id: 3,
-                title: "Title 3",
-                psuId: 77777777,
-                description: "Description 3",
-                timestamp: "May 22"
-            },
-            {
-                id: 4,
-                title: "Title 4",
-                psuId: 66666666,
-                description: "Description 4",
-                timestamp: "May 23"
-            },
-        ]
+        searched: []
     }),
     methods: {
         searchTitleOnTable() {
@@ -133,9 +102,13 @@ export default {
         }
     },
     created () {
-      this.searched = this.logs
+      this.$store.dispatch('fetchInteractionLogs');
+    },
+    computed: {
+      logs() {
+        return Array.from(this.$store.state.interactionLogs.values())
+      }
     }
-
 }
 </script>
 <style scoped>

@@ -49,8 +49,8 @@
       <h3>Transcript Courses</h3>
       <md-list>
         <ClassEditingRow
-          v-for="course in transcript.COURSES"
-          v-bind:course="course"
+          v-for="course in Object.values(transcript.results)"
+          v-bind:course_data="course"
           v-bind:key="course.name"
           @on-delete="handleDeleteCourse" />
         <md-list-item>
@@ -77,12 +77,15 @@ export default {
   components: {ClassEditingRow},
   data () {
     return {
+      transcript: {},
       isLoading: true,
       showConfirmSubmit: false,
       showConfirmDiscardChanges: false,
     };
   },
-
+  created() {
+    this.transcript = this.$props.transcript_data;
+  },
   methods: {
     /**
      * Handle the submission of a completed transcript
@@ -137,7 +140,16 @@ export default {
       this.$emit('cancel')
     }
   },
-  props: ['transcript']
+  watch: {
+    transcript_data: {
+      immediate: true,
+      deep: true,
+      handler(val, oldVal){
+        this.transcript = val;
+      }
+    }
+  },
+  props: ['transcript_data']
 }
 </script>
 

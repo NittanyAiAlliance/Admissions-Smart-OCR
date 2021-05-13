@@ -17,7 +17,7 @@
             <div v-if="isLoading" class="md-layout md-gutter md-alignment-center-center">
               <md-progress-spinner class="md-accent" :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner><br/>
             </div>
-            <TranscriptEditPane v-if="!isLoading" :transcript="transcript" @cancel="handleCancel" @submit="handleSubmit"/>
+            <TranscriptEditPane v-if="!isLoading" :transcript_data="transcript" @cancel="handleCancel" @submit="handleSubmit"/>
           </div>
         </md-app-content>
       </md-app>
@@ -84,6 +84,7 @@ export default {
       // Set the local transcript data
       this.transcript = this.$route.params.transcript
       this.transcript.results = response.data
+      console.log(this.transcript);
       // Set loading to be done as we have the transcript data now
       this.isLoading = false;
     });

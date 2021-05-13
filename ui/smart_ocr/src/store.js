@@ -9,14 +9,16 @@ const Store = new Vuex.Store({
     // WebSocket client object
     client : null,
     // Transcript map, key is document id, value is transcript data object
-    transcripts: new Map()
+    transcripts: new Map(),
+    // Interaction log array
+    interactionLogs: []
   },
   actions : {
     handleUpdate(context, msg) {
       // Get the command payload from the message object
       const cmd = JSON.parse(msg.data);
       // Dispatch the action related to the command type with the transcript id
-      context.commit(cmd.type, cmd.did);
+      context.commit(cmd.type, cmd);
     },
     handleError( { context } ) {
       // TODO: something here / DEBUG
@@ -37,6 +39,7 @@ const Store = new Vuex.Store({
       }
       // Create new WebSocket client object
       const client = new WebSocket("ws://localhost:2021");
+      //const client = new WebSocket("ws://localhost:2021");
       // Set handlers for the WebSocket client
       client.onmessage = (msg) => context.dispatch('handleUpdate', msg);
       client.onerror = () => context.dispatch('handleError');
@@ -87,6 +90,11 @@ const Store = new Vuex.Store({
       get.getTranscriptQueue().then(transcripts => {
         context.commit('setTranscripts', transcripts.data.queue);
       });
+    },
+    fetchInteractionLogs(context) {
+      get.getInteractionLogs().then(logs => {
+        context.commit('setInteractionLogs', logs.data.logs);
+      });
     }
   },
   mutations : {
@@ -115,31 +123,48 @@ const Store = new Vuex.Store({
       // Update the state object with the new transcripts
       state.transcripts = transcriptsMap;
     },
+    setInteractionLogs(state, logs) {
+      state.interactionLogs = logs;
+    },
     /**
      * Handle another client telling us that a transcript has been checked out
      * @param state store state object
-     * @param transcriptId Document ID of the transcript that has been checked out
+     * @param transcript Document ID of the transcript that has been checked out
      */
-    checkOut(state, transcriptId){
+    checkOut(state, transcript){
       // Fetch the transcript that another client told us they checked out from the queue map
-      const mutatedTranscript = state.transcripts.get(transcriptId);
+      const mutatedTranscript = state.transcripts.get(transcript.did);
       // Set the checked out flag to true ~ we just were told that it was checked out
       mutatedTranscript.CHECKED_OUT = true;
       // Perform mutation to the transcript queue map
-      state.transcripts.set(transcriptId, mutatedTranscript);
+      state.transcripts.set(transcript.did, mutatedTranscript);
+      state.interactionLogs.push({
+        title : "Check Out",
+        description : "Transcript Correction Check-out",
+        uid : transcript.uid,
+        did : transcript.did,
+        timestamp : new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString()
+      });
     },
     /**
      * Handle another client telling us that a transcript has been checked in
      * @param state store state object
-     * @param transcriptId Document ID of the transcript that has been checked in
+     * @param transcript Document ID of the transcript that has been checked in
      */
-    checkIn(state, transcriptId){
+    checkIn(state, transcript){
       // Fetch the transcript that another client told us they checked in from the queue map
-      const mutatedTranscript = state.transcripts.get(transcriptId);
+      const mutatedTranscript = state.transcripts.get(transcript.did);
       // Set the checked in flag to false ~ we just were told that it was checked in
       mutatedTranscript.CHECKED_OUT = false;
       // Perform mutation to the transcript queue map
-      state.transcripts.set(transcriptId, mutatedTranscript);
+      state.transcripts.set(transcript.did, mutatedTranscript);
+      state.interactionLogs.push({
+        title : "Check In",
+        description : "Transcript Correction Check-in",
+        uid : transcript.uid,
+        did : transcript.did,
+        timestamp : new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString()
+      });
     }
   }
 });

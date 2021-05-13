@@ -76,10 +76,23 @@ export default {
   name: "ClassEditingRow",
   data: function() {
     return {
-      course : Object.freeze(this.course),
+      course : {},
       showConfirmDelete : false,
       state: {
         isConfirmed : false
+      }
+    }
+  },
+  created() {
+    for(let i = 0; i < this.course_data.length; i ++){
+      if(this.course_data[i][0] === "COURSE"){
+        this.course.name = this.course_data[i][1]
+      }
+      else if(this.course_data[i][0] === "GRADE"){
+        this.course.grade = this.course_data[i][1]
+      }
+      else if(this.course_data[i][0] === "CREDIT"){
+        this.course.credits = this.course_data[i][1]
       }
     }
   },
@@ -102,7 +115,7 @@ export default {
       this.state.isConfirmed = !this.state.isConfirmed;
     },
   },
-  props: ["course"],
+  props: ["course_data"],
 }
 </script>
 
